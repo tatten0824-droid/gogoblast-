@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>GOGO! Blast - やじるしパズル</title>
+  <title>GOGO! Blast - やじるしパズル（全500レベル）</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,13 +25,13 @@
 
     /* 3Dぷっくりブロック効果 */
     .block-3d {
-      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18), 0 6px 10px rgba(0, 0, 0, 0.12), inset 0 2px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18), 0 6px 10px rgba(0, 0, 0, 0.15), inset 0 2px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.15);
       transition: transform 0.08s ease, box-shadow 0.08s ease;
       cursor: pointer;
     }
     .block-3d:active {
       transform: translateY(2px) scale(0.97);
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.18), 0 3px 5px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.18), 0 3px 5px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.35);
     }
 
     /* 障害物（岩ブロック） */
@@ -49,35 +49,41 @@
       transform: translateY(2px);
       box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+    .btn-3d:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+    }
 
     /* ぶつかったときのブルブル振動アニメーション */
     @keyframes shake-up {
       0%, 100% { transform: translateY(0); }
-      20% { transform: translateY(-10px); }
+      20% { transform: translateY(-8px); }
       40% { transform: translateY(3px) rotate(-3deg); }
       60% { transform: translateY(-3px) rotate(3deg); }
-      80% { transform: translateY(2px); }
+      80% { transform: translateY(1px); }
     }
     @keyframes shake-down {
       0%, 100% { transform: translateY(0); }
-      20% { transform: translateY(10px); }
+      20% { transform: translateY(8px); }
       40% { transform: translateY(-3px) rotate(-3deg); }
       60% { transform: translateY(3px) rotate(3deg); }
-      80% { transform: translateY(-2px); }
+      80% { transform: translateY(-1px); }
     }
     @keyframes shake-left {
       0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-10px); }
+      20% { transform: translateX(-8px); }
       40% { transform: translateX(3px) rotate(-3deg); }
       60% { transform: translateX(-3px) rotate(3deg); }
-      80% { transform: translateY(2px); }
+      80% { transform: translateY(1px); }
     }
     @keyframes shake-right {
       0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(10px); }
+      20% { transform: translateX(8px); }
       40% { transform: translateX(-3px) rotate(-3deg); }
       60% { transform: translateX(3px) rotate(3deg); }
-      80% { transform: translateY(-2px); }
+      80% { transform: translateY(-1px); }
     }
 
     .shaking-up { animation: shake-up 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
@@ -87,123 +93,158 @@
 
     /* 飛び出しアニメーション */
     .fly-up {
-      transform: translateY(-900px) scale(1.1) !important;
+      transform: translateY(-850px) scale(1.15) !important;
       opacity: 0;
       transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease-in !important;
     }
     .fly-down {
-      transform: translateY(900px) scale(1.1) !important;
+      transform: translateY(850px) scale(1.15) !important;
       opacity: 0;
       transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease-in !important;
     }
     .fly-left {
-      transform: translateX(-900px) scale(1.1) !important;
+      transform: translateX(-850px) scale(1.15) !important;
       opacity: 0;
       transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease-in !important;
     }
     .fly-right {
-      transform: translateX(900px) scale(1.1) !important;
+      transform: translateX(850px) scale(1.15) !important;
       opacity: 0;
       transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease-in !important;
+    }
+
+    /* 戻しアニメーション（ポップイン） */
+    @keyframes pop-in {
+      0% { transform: scale(0.3); opacity: 0; }
+      70% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .anim-pop-in {
+      animation: pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
     }
 
     /* 星のアニメーション */
     @keyframes star-pop {
       0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-      70% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+      70% { transform: scale(1.25) rotate(10deg); opacity: 1; }
       100% { transform: scale(1) rotate(0deg); opacity: 1; }
     }
     .star-pop-1 { animation: star-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both; }
     .star-pop-2 { animation: star-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s both; }
     .star-pop-3 { animation: star-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s both; }
+
+    /* 横スクロールタブ用 */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="flex flex-col items-center justify-between p-2.5 sm:p-5 select-none text-slate-800">
+<body class="flex flex-col items-center justify-between p-2 sm:p-4 select-none text-slate-800">
 
   <!-- パーティクル＆紙吹雪 Canvas -->
   <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
 
   <!-- 上部ヘッダー -->
-  <header class="w-full max-w-md flex items-center justify-between gap-2 mb-1.5">
+  <header class="w-full max-w-md flex items-center justify-between gap-1 mb-1.5">
     <!-- タイトルロゴ -->
-    <div class="flex items-center gap-1.5">
-      <div class="bg-gradient-to-r from-pink-500 via-yellow-400 to-cyan-400 text-white font-black text-lg sm:text-2xl px-2.5 py-1 rounded-2xl shadow-md tracking-wider flex items-center gap-1 border-2 border-white">
+    <div class="flex items-center gap-1">
+      <div class="bg-gradient-to-r from-pink-500 via-yellow-400 to-cyan-400 text-white font-black text-base sm:text-xl px-2.5 py-1 rounded-2xl shadow-md tracking-wider flex items-center gap-1 border-2 border-white">
         <span>GOGO!</span>
         <span class="text-yellow-200">BLAST</span>
       </div>
     </div>
 
-    <!-- 操作ボタン群 -->
-    <div class="flex items-center gap-1.5 sm:gap-2">
-      <!-- ステージ選択ボタン -->
-      <button id="levelSelectBtn" class="btn-3d bg-indigo-500 hover:bg-indigo-600 text-white font-bold p-2 sm:p-2.5 rounded-2xl flex items-center justify-center text-sm border-2 border-white" title="ステージをえらぶ">
-        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+    <!-- 操作ボタン群（右側） -->
+    <div class="flex items-center gap-1 sm:gap-1.5">
+      <!-- 1手もどすボタン (Undo) -->
+      <button id="undoBtn" class="btn-3d bg-violet-500 hover:bg-violet-600 text-white font-bold px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl flex items-center gap-1 text-xs sm:text-sm border-2 border-white" title="1手もどす">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a5 5 0 0 1 5 5v2m0 0l-4-4m4 4l4-4"/>
         </svg>
+        <span class="hidden xs:inline">もどす</span>
       </button>
 
       <!-- リトライボタン -->
-      <button id="retryBtn" class="btn-3d bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold p-2 sm:p-2.5 rounded-2xl flex items-center justify-center text-sm border-2 border-white" title="やりなおす">
-        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button id="retryBtn" class="btn-3d bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold p-1.5 sm:p-2 rounded-xl flex items-center justify-center text-sm border-2 border-white" title="最初からやりなおす">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
         </svg>
       </button>
 
+      <!-- ステージ選択ボタン -->
+      <button id="levelSelectBtn" class="btn-3d bg-indigo-500 hover:bg-indigo-600 text-white font-bold p-1.5 sm:p-2 rounded-xl flex items-center justify-center text-sm border-2 border-white" title="ステージをえらぶ">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
       <!-- サウンドON/OFF -->
-      <button id="soundToggleBtn" class="btn-3d bg-emerald-400 hover:bg-emerald-500 text-emerald-950 font-bold p-2 sm:p-2.5 rounded-2xl flex items-center justify-center text-sm border-2 border-white" title="おとのきりかえ">
-        <svg id="soundIconOn" class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button id="soundToggleBtn" class="btn-3d bg-emerald-400 hover:bg-emerald-500 text-emerald-950 font-bold p-1.5 sm:p-2 rounded-xl flex items-center justify-center text-sm border-2 border-white" title="おとのきりかえ">
+        <svg id="soundIconOn" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
         </svg>
-        <svg id="soundIconOff" class="w-5 h-5 sm:w-6 sm:h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg id="soundIconOff" class="w-4 h-4 sm:w-5 sm:h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
         </svg>
       </button>
 
       <!-- あそびかたヒント -->
-      <button id="helpBtn" class="btn-3d bg-sky-400 hover:bg-sky-500 text-sky-950 font-bold p-2 sm:p-2.5 rounded-2xl flex items-center justify-center text-sm border-2 border-white" title="あそびかた">
-        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button id="helpBtn" class="btn-3d bg-sky-400 hover:bg-sky-500 text-sky-950 font-bold p-1.5 sm:p-2 rounded-xl flex items-center justify-center text-sm border-2 border-white" title="あそびかた">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
       </button>
     </div>
   </header>
 
-  <!-- ステータスバー（レベルとステージ名） -->
-  <div class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl p-2.5 sm:p-3 shadow-md border-2 border-white/80 flex items-center justify-between mb-2">
-    <div class="flex items-center gap-2 overflow-hidden">
+  <!-- ステータスバー（◀ 前のレベル / バッジ / 次のレベル ▶） -->
+  <div class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl p-2 sm:p-2.5 shadow-md border-2 border-white/80 flex items-center justify-between gap-1.5 mb-2">
+    <!-- レベル移動コントロール -->
+    <div class="flex items-center gap-1">
+      <button id="prevLevelBtn" class="btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-black p-1.5 rounded-xl border border-indigo-200" title="前のレベルへもどる">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
       <span id="levelBadge" class="bg-gradient-to-r from-amber-400 to-orange-400 text-white font-black text-xs sm:text-sm px-2.5 py-1 rounded-xl shadow-sm whitespace-nowrap">
-        Lv. 1 / 20
+        Lv. 1 / 500
       </span>
-      <h2 id="levelTitle" class="text-sm sm:text-base font-black text-slate-700 tracking-wide truncate">
-        はじめてのシュッ！
-      </h2>
+
+      <button id="nextLevelBtnHeader" class="btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-black p-1.5 rounded-xl border border-indigo-200" title="次のレベルへすすむ">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
     </div>
 
+    <!-- レベルタイトル -->
+    <h2 id="levelTitle" class="text-xs sm:text-sm font-black text-slate-700 tracking-wide truncate max-w-[140px] sm:max-w-[180px]">
+      はじめてのシュッ！
+    </h2>
+
     <!-- 残りブロック数 -->
-    <div class="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-xl whitespace-nowrap">
-      <span class="text-xs font-bold text-slate-500">のこり</span>
-      <span id="remainCount" class="text-base sm:text-lg font-black text-indigo-600">2</span>
+    <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-xl whitespace-nowrap">
+      <span class="text-[10px] sm:text-xs font-bold text-slate-500">のこり</span>
+      <span id="remainCount" class="text-sm sm:text-base font-black text-indigo-600">2</span>
     </div>
   </div>
 
   <!-- ゲーム盤面エリア -->
   <main class="w-full max-w-md flex-1 flex flex-col items-center justify-center my-auto">
     <!-- 盤面外枠（トレイ） -->
-    <div class="relative w-full aspect-square max-w-[420px] p-2 sm:p-4 bg-gradient-to-b from-white/95 to-slate-100/95 rounded-3xl shadow-xl border-4 border-white flex items-center justify-center overflow-hidden">
+    <div class="relative w-full aspect-square max-w-[430px] p-2 sm:p-3 bg-gradient-to-b from-white/95 to-slate-100/95 rounded-3xl shadow-xl border-4 border-white flex items-center justify-center overflow-hidden">
       
       <!-- 盤面グリッド背景 -->
-      <div id="gridBackground" class="absolute inset-2 sm:inset-4 rounded-2xl bg-slate-100/80 border-2 border-dashed border-slate-300"></div>
+      <div id="gridBackground" class="absolute inset-2 sm:inset-3 rounded-2xl bg-slate-100/80 border-2 border-dashed border-slate-300"></div>
 
       <!-- ブロック配置コンテナ -->
-      <div id="boardContainer" class="relative w-full h-full z-10">
-        <!-- 矢印ブロックが動的にレンダリングされます -->
-      </div>
+      <div id="boardContainer" class="relative w-full h-full z-10"></div>
     </div>
   </main>
 
-  <!-- フッター：メッセージ -->
-  <footer class="w-full max-w-md text-center py-1.5">
-    <p id="hintText" class="text-xs sm:text-sm font-bold text-slate-600 bg-white/70 backdrop-blur-sm py-1 px-3.5 rounded-full inline-block shadow-sm border border-white">
+  <!-- フッター：メッセージ & 1手もどす案内 -->
+  <footer class="w-full max-w-md text-center py-1.5 flex items-center justify-center gap-2">
+    <p id="hintText" class="text-xs sm:text-sm font-bold text-slate-600 bg-white/70 backdrop-blur-sm py-1.5 px-3.5 rounded-full inline-block shadow-sm border border-white truncate max-w-full">
       あいている ほうこうへ シュッ！と とばそう！
     </p>
   </footer>
@@ -218,7 +259,6 @@
         たいへんよくできました！
       </h3>
 
-      <!-- 獲得した星（3つ） -->
       <div class="flex justify-center items-center gap-3 my-4">
         <span class="text-5xl star-pop-1">⭐️</span>
         <span class="text-6xl star-pop-2">⭐️</span>
@@ -229,7 +269,7 @@
         ぜんぶのやじるしが とんでいったよ！<br>つぎのステージに ちょうせんしよう！
       </p>
 
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2.5">
         <button id="nextLevelBtn" class="btn-3d w-full py-3.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-black text-lg rounded-2xl shadow-lg border-2 border-white">
           つぎのレベルへ GO! 🚀
         </button>
@@ -240,37 +280,54 @@
     </div>
   </div>
 
-  <!-- ==================== モーダル：ステージ選択 ==================== -->
-  <div id="levelModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl border-4 border-indigo-200 flex flex-col max-h-[85vh]">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
-          <span>🎯</span> ステージをえらぶ
-        </h3>
+  <!-- ==================== モーダル：ステージ選択（全500レベル対応） ==================== -->
+  <div id="levelModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl p-4 sm:p-5 max-w-md w-full shadow-2xl border-4 border-indigo-200 flex flex-col max-h-[90vh]">
+      <!-- ヘッダー -->
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🎯</span>
+          <h3 class="text-base sm:text-lg font-black text-slate-800">ステージをえらぶ (全500Lv)</h3>
+        </div>
         <button id="closeLevelModalBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-full">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
 
-      <!-- むげんチャレンジボタン -->
-      <button id="endlessModeBtn" class="btn-3d w-full mb-3 py-2.5 px-3 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 hover:opacity-95 text-white font-black rounded-2xl flex items-center justify-between border-2 border-white shadow-md">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">⚡️</span>
-          <span class="text-sm">むげんチャレンジ（8×8 超広大）</span>
+      <!-- むげんチャレンジ案内バナー -->
+      <div class="mb-2 p-2.5 bg-gradient-to-r from-purple-500 via-indigo-500 to-pink-500 rounded-2xl text-white shadow-md flex items-center justify-between">
+        <div>
+          <div class="font-black text-xs sm:text-sm">🎲 むげんチャレンジ！</div>
+          <div class="text-[10px] text-purple-100">8×8の超広大パズルを自動生成！</div>
         </div>
-        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">ランダム生成 🎲</span>
-      </button>
+        <button id="endlessBtn" class="btn-3d px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black text-xs rounded-xl shadow border border-white">
+          あそぶ！
+        </button>
+      </div>
 
-      <!-- レベル一覧（1〜20） -->
-      <div id="levelGrid" class="grid grid-cols-2 gap-2 overflow-y-auto p-1 flex-1">
+      <!-- 現在地ジャンプボタン -->
+      <div class="mb-2">
+        <button id="jumpCurrentBtn" class="btn-3d w-full py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-black rounded-xl text-xs flex items-center justify-center gap-1">
+          <span>📍</span>
+          <span id="jumpCurrentText">現在のレベルへジャンプ</span>
+        </button>
+      </div>
+
+      <!-- 50レベル単位のページ切り替えタブ（横スクロール） -->
+      <div id="pageTabsContainer" class="flex gap-1.5 overflow-x-auto no-scrollbar py-1 mb-2 border-b border-slate-100">
+        <!-- JSでタブボタン（1〜50, 51〜100, ... 451〜500）を生成 -->
+      </div>
+
+      <!-- レベル一覧グリッド (5列でスッキリ表示) -->
+      <div id="levelGrid" class="grid grid-cols-5 gap-1.5 overflow-y-auto p-1 flex-1 content-start">
         <!-- JSで動的にボタン生成 -->
       </div>
 
-      <!-- セーブデータリセットエリア -->
-      <div class="pt-3 border-t border-slate-100 mt-2 flex justify-between items-center text-xs text-slate-400 font-bold">
-        <span>全20ステージ＋むげんモード</span>
+      <!-- フッター：リセット案内 -->
+      <div class="pt-2 border-t border-slate-100 mt-2 flex justify-between items-center text-[11px] text-slate-400 font-bold">
+        <span>全500レベル（自動保存）</span>
         <button id="resetDataBtn" class="hover:text-red-500 underline">きろくをリセット</button>
       </div>
 
@@ -291,7 +348,7 @@
       <div class="text-4xl mb-2">🚀</div>
       <h3 class="text-xl font-black text-slate-800 mb-3">あそびかた</h3>
       
-      <div class="space-y-3 text-left text-sm font-bold text-slate-600 bg-sky-50 p-4 rounded-2xl mb-5">
+      <div class="space-y-3 text-left text-sm font-bold text-slate-600 bg-sky-50 p-4 rounded-2xl mb-4">
         <div class="flex items-start gap-2">
           <span class="text-sky-500 font-black text-base">①</span>
           <span>やじるしをタップすると、そのほうこうへ「シュッ！」と とんでいくよ！</span>
@@ -302,7 +359,11 @@
         </div>
         <div class="flex items-start gap-2">
           <span class="text-sky-500 font-black text-base">③</span>
-          <span>まえがあいているやじるしから じゅんばんにタップして、ぜんぶクリアしよう！</span>
+          <span>まちがえたら「↩️ もどす」ボタンで1手前にいつでも戻せるよ！</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="text-sky-500 font-black text-base">④</span>
+          <span>「◀」「▶」やステージ一覧から、クリアした過去のレベルへいつでも戻って遊べるよ！全500レベル制覇をめざそう！</span>
         </div>
       </div>
 
@@ -314,8 +375,199 @@
 
   <script>
     /* ==========================================================================
-       GOGO! Blast - Web Edition (Expanded 20 Levels & Endless Mode)
+       GOGO! Blast - Web Edition (500-Level Procedural & Undo Support)
        ========================================================================== */
+
+    const MAX_LEVELS = 500;
+
+    // --- シード付き疑似乱数生成器 (Mulberry32) ---
+    function mulberry32(a) {
+      return function() {
+        var t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    // --- レベル難易度・設定のスケジューラー (1〜500) ---
+    function getLevelConfig(lvl) {
+      if (lvl === 1) return { rows: 2, cols: 2, arrows: 2, rocks: 0 };
+      if (lvl <= 5) return { rows: 3, cols: 3, arrows: 2 + lvl, rocks: 0 };
+      if (lvl <= 20) return { rows: 4, cols: 4, arrows: 6 + Math.floor((lvl - 6) * 5 / 14), rocks: lvl < 10 ? 0 : 1 };
+      if (lvl <= 60) return { rows: 5, cols: 5, arrows: 10 + Math.floor((lvl - 21) * 8 / 39), rocks: lvl < 35 ? 1 : 2 };
+      if (lvl <= 130) return { rows: 6, cols: 6, arrows: 16 + Math.floor((lvl - 61) * 10 / 69), rocks: lvl < 90 ? 2 : 3 };
+      if (lvl <= 250) return { rows: 7, cols: 7, arrows: 22 + Math.floor((lvl - 131) * 14 / 119), rocks: lvl < 180 ? 2 : (lvl < 220 ? 3 : 4) };
+      return { rows: 8, cols: 8, arrows: 30 + Math.floor((lvl - 251) * 18 / 249), rocks: lvl < 330 ? 3 : (lvl < 420 ? 4 : 5) };
+    }
+
+    // --- 逆算シミュレーション生成器（100%解法保証） ---
+    function generateLevel(lvlNum) {
+      const cfg = getLevelConfig(lvlNum);
+      const { rows, cols, arrows: targetArrows, rocks: numRocks } = cfg;
+      const rand = mulberry32(lvlNum * 12345 + 67891);
+      const colors = ["orange", "blue", "emerald", "pink", "purple", "amber", "cyan"];
+      const dirs = ["up", "down", "left", "right"];
+
+      // 障害物の岩を配置する候補地（外周以外のマス）
+      const innerCells = [];
+      for (let r = 1; r < rows - 1; r++) {
+        for (let c = 1; c < cols - 1; c++) {
+          innerCells.push({ r, c });
+        }
+      }
+
+      for (let i = innerCells.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [innerCells[i], innerCells[j]] = [innerCells[j], innerCells[i]];
+      }
+
+      const occupied = new Set();
+      const items = [];
+      for (let i = 0; i < numRocks && i < innerCells.length; i++) {
+        const cell = innerCells[i];
+        items.push({ id: "rock" + (i + 1), type: "rock", r: cell.r, c: cell.c });
+        occupied.add(cell.r + "," + cell.c);
+      }
+
+      // 逆順に「脱出ルートが空いている矢印」を配置
+      let attempts = 0;
+      let arrowId = 1;
+      while (arrowId <= targetArrows && attempts < 3000) {
+        attempts++;
+        const r = Math.floor(rand() * rows);
+        const c = Math.floor(rand() * cols);
+        const key = r + "," + c;
+        if (occupied.has(key)) continue;
+
+        const shufDirs = dirs.slice();
+        for (let i = shufDirs.length - 1; i > 0; i--) {
+          const j = Math.floor(rand() * (i + 1));
+          [shufDirs[i], shufDirs[j]] = [shufDirs[j], shufDirs[i]];
+        }
+
+        for (const d of shufDirs) {
+          const dr = d === "up" ? -1 : (d === "down" ? 1 : 0);
+          const dc = d === "left" ? -1 : (d === "right" ? 1 : 0);
+          let cr = r + dr, cc = c + dc;
+          let clear = true;
+          while (cr >= 0 && cr < rows && cc >= 0 && cc < cols) {
+            if (occupied.has(cr + "," + cc)) {
+              clear = false;
+              break;
+            }
+            cr += dr;
+            cc += dc;
+          }
+          if (clear) {
+            occupied.add(key);
+            items.push({
+              id: arrowId,
+              r, c, dir: d,
+              color: colors[Math.floor(rand() * colors.length)]
+            });
+            arrowId++;
+            break;
+          }
+        }
+      }
+
+      // ステージ名
+      let title = `レベル ${lvlNum}`;
+      if (lvlNum === 1) title = "はじめてのシュッ！";
+      else if (lvlNum === 5) title = "3×3マスター！";
+      else if (lvlNum === 10) title = "おじゃま岩登場！";
+      else if (lvlNum === 50) title = "5×5メガパズル！";
+      else if (lvlNum === 100) title = "6×6センチュリー！";
+      else if (lvlNum === 250) title = "ハーフマスター！";
+      else if (lvlNum === 500) title = "究極のグランドマスター！";
+
+      return {
+        id: lvlNum,
+        title,
+        hint: rows >= 7 ? "7×7・8×8の大盤面！外側から順番に崩そう！" : "あいている ほうこうへ シュッ！と とばそう！",
+        rows, cols, items
+      };
+    }
+
+    // --- むげんチャレンジ用生成器 ---
+    function generateEndlessLevel() {
+      const rows = 8, cols = 8;
+      const targetArrows = 46;
+      const numRocks = 4;
+      const seed = Math.floor(Math.random() * 9999999);
+      const rand = mulberry32(seed);
+      const colors = ["orange", "blue", "emerald", "pink", "purple", "amber", "cyan"];
+      const dirs = ["up", "down", "left", "right"];
+
+      const innerCells = [];
+      for (let r = 1; r < rows - 1; r++) {
+        for (let c = 1; c < cols - 1; c++) {
+          innerCells.push({ r, c });
+        }
+      }
+
+      for (let i = innerCells.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [innerCells[i], innerCells[j]] = [innerCells[j], innerCells[i]];
+      }
+
+      const occupied = new Set();
+      const items = [];
+      for (let i = 0; i < numRocks && i < innerCells.length; i++) {
+        const cell = innerCells[i];
+        items.push({ id: "rock" + (i + 1), type: "rock", r: cell.r, c: cell.c });
+        occupied.add(cell.r + "," + cell.c);
+      }
+
+      let attempts = 0;
+      let arrowId = 1;
+      while (arrowId <= targetArrows && attempts < 3000) {
+        attempts++;
+        const r = Math.floor(rand() * rows);
+        const c = Math.floor(rand() * cols);
+        const key = r + "," + c;
+        if (occupied.has(key)) continue;
+
+        const shufDirs = dirs.slice();
+        for (let i = shufDirs.length - 1; i > 0; i--) {
+          const j = Math.floor(rand() * (i + 1));
+          [shufDirs[i], shufDirs[j]] = [shufDirs[j], shufDirs[i]];
+        }
+
+        for (const d of shufDirs) {
+          const dr = d === "up" ? -1 : (d === "down" ? 1 : 0);
+          const dc = d === "left" ? -1 : (d === "right" ? 1 : 0);
+          let cr = r + dr, cc = c + dc;
+          let clear = true;
+          while (cr >= 0 && cr < rows && cc >= 0 && cc < cols) {
+            if (occupied.has(cr + "," + cc)) {
+              clear = false;
+              break;
+            }
+            cr += dr;
+            cc += dc;
+          }
+          if (clear) {
+            occupied.add(key);
+            items.push({
+              id: arrowId,
+              r, c, dir: d,
+              color: colors[Math.floor(rand() * colors.length)]
+            });
+            arrowId++;
+            break;
+          }
+        }
+      }
+
+      return {
+        id: "endless",
+        title: "むげんパズル (8×8)",
+        hint: `矢印が${arrowId - 1}個！外側から少しずつ崩そう！`,
+        rows, cols, items
+      };
+    }
 
     // --- サウンドシステム (Web Audio API) ---
     let audioCtx = null;
@@ -326,7 +578,7 @@
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContextClass();
       }
-      if (audioCtx.state === 'suspended') {
+      if (audioCtx.state === "suspended") {
         audioCtx.resume();
       }
       return audioCtx;
@@ -342,31 +594,55 @@
 
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = 'triangle';
+        osc.type = "triangle";
         osc.frequency.setValueAtTime(baseFreq, now);
-        osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.4, now + 0.16);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.2, now + 0.15);
 
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        gain.gain.setValueAtTime(0.28, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
 
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.22);
+        osc.stop(now + 0.2);
 
         const osc2 = ctx.createOscillator();
         const gain2 = ctx.createGain();
-        osc2.type = 'sine';
+        osc2.type = "sine";
         osc2.frequency.setValueAtTime(baseFreq * 2, now);
-        osc2.frequency.exponentialRampToValueAtTime(baseFreq * 3.5, now + 0.14);
+        osc2.frequency.exponentialRampToValueAtTime(baseFreq * 3.2, now + 0.12);
 
-        gain2.gain.setValueAtTime(0.15, now);
-        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+        gain2.gain.setValueAtTime(0.12, now);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
 
         osc2.connect(gain2);
         gain2.connect(ctx.destination);
         osc2.start(now);
-        osc2.stop(now + 0.18);
+        osc2.stop(now + 0.16);
+      } catch (e) {
+        console.error("Audio error:", e);
+      }
+    }
+
+    function playUndoSound() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(480, now + 0.12);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.14);
       } catch (e) {
         console.error("Audio error:", e);
       }
@@ -380,7 +656,7 @@
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
-        osc.type = 'sine';
+        osc.type = "sine";
         osc.frequency.setValueAtTime(220, now);
         osc.frequency.exponentialRampToValueAtTime(90, now + 0.12);
 
@@ -401,22 +677,22 @@
       try {
         const ctx = getAudioContext();
         const now = ctx.currentTime;
-        const notes = [523.25, 659.25, 783.99, 1046.50];
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
         notes.forEach((freq, i) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          const t = now + i * 0.1;
+          const t = now + i * 0.08;
 
-          osc.type = i === 3 ? 'sine' : 'triangle';
+          osc.type = i === 4 ? "sine" : "triangle";
           osc.frequency.setValueAtTime(freq, t);
 
           gain.gain.setValueAtTime(0.28, t);
-          gain.gain.exponentialRampToValueAtTime(0.001, t + (i === 3 ? 0.8 : 0.4));
+          gain.gain.exponentialRampToValueAtTime(0.001, t + (i === 4 ? 0.9 : 0.4));
 
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start(t);
-          osc.stop(t + (i === 3 ? 0.85 : 0.45));
+          osc.stop(t + (i === 4 ? 0.95 : 0.45));
         });
       } catch (e) {
         console.error("Audio error:", e);
@@ -431,7 +707,7 @@
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
-        osc.type = 'sine';
+        osc.type = "sine";
         osc.frequency.setValueAtTime(600, now);
         osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
 
@@ -448,8 +724,8 @@
     }
 
     // --- パーティクル＆紙吹雪 ---
-    const fxCanvas = document.getElementById('fxCanvas');
-    const fxCtx = fxCanvas.getContext('2d');
+    const fxCanvas = document.getElementById("fxCanvas");
+    const fxCtx = fxCanvas.getContext("2d");
     let particles = [];
     let confetti = [];
 
@@ -457,14 +733,14 @@
       fxCanvas.width = window.innerWidth;
       fxCanvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
     function spawnStarburst(x, y, color) {
-      const colors = [color, '#FDE047', '#FFFFFF', '#F472B6', '#38BDF8'];
-      for (let i = 0; i < 12; i++) {
-        const angle = (Math.PI * 2 / 12) * i + (Math.random() * 0.4 - 0.2);
-        const speed = 3 + Math.random() * 4;
+      const colors = [color, "#FDE047", "#FFFFFF", "#F472B6", "#38BDF8"];
+      for (let i = 0; i < 10; i++) {
+        const angle = (Math.PI * 2 / 10) * i + (Math.random() * 0.4 - 0.2);
+        const speed = 2.5 + Math.random() * 3.5;
         particles.push({
           x, y,
           vx: Math.cos(angle) * speed,
@@ -472,21 +748,21 @@
           size: 4 + Math.random() * 4,
           color: colors[Math.floor(Math.random() * colors.length)],
           alpha: 1,
-          decay: 0.03 + Math.random() * 0.02,
+          decay: 0.035 + Math.random() * 0.02,
           isStar: Math.random() > 0.4
         });
       }
     }
 
     function spawnConfetti() {
-      const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#FBBF24'];
+      const colors = ["#EF4444", "#F59E0B", "#10B981", "#3B82F6", "#8B5CF6", "#EC4899", "#FBBF24"];
       for (let i = 0; i < 90; i++) {
         confetti.push({
           x: Math.random() * fxCanvas.width,
           y: -20 - Math.random() * 50,
           vx: (Math.random() - 0.5) * 4,
           vy: 3 + Math.random() * 4,
-          size: 7 + Math.random() * 5,
+          size: 8 + Math.random() * 6,
           color: colors[Math.floor(Math.random() * colors.length)],
           rotation: Math.random() * 360,
           vRot: (Math.random() - 0.5) * 10,
@@ -519,7 +795,7 @@
           fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           fxCtx.fill();
         } else {
-          fxCtx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+          fxCtx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
         }
         fxCtx.restore();
       }
@@ -547,40 +823,37 @@
     }
     requestAnimationFrame(updateFx);
 
-    // --- 20段階のレベルデータ（2x2〜最大8x8、全問解法検証済み） ---
-    const LEVELS = [{"id": 1, "title": "はじめてのシュッ！", "hint": "やじるしをタップして そとにシュッ！", "rows": 2, "cols": 2, "items": [{"id": 1, "r": 0, "c": 0, "dir": "down", "color": "purple"}, {"id": 2, "r": 1, "c": 0, "dir": "down", "color": "amber"}]}, {"id": 2, "title": "３つのやじるし", "hint": "ぜんぶそとをむいているよ！", "rows": 3, "cols": 3, "items": [{"id": 1, "r": 0, "c": 1, "dir": "up", "color": "purple"}, {"id": 2, "r": 1, "c": 1, "dir": "down", "color": "amber"}, {"id": 3, "r": 2, "c": 1, "dir": "down", "color": "cyan"}]}, {"id": 3, "title": "じゅんばんパズル", "hint": "まえにいるやじるしから さきにとばそう！", "rows": 3, "cols": 3, "items": [{"id": 1, "r": 0, "c": 2, "dir": "down", "color": "purple"}, {"id": 2, "r": 1, "c": 2, "dir": "left", "color": "amber"}, {"id": 3, "r": 1, "c": 1, "dir": "left", "color": "cyan"}, {"id": 4, "r": 2, "c": 2, "dir": "down", "color": "emerald"}]}, {"id": 4, "title": "たてのれんさ", "hint": "うえのやじるしから じゅんばんにとばそう！", "rows": 3, "cols": 3, "items": [{"id": 1, "r": 0, "c": 1, "dir": "up", "color": "purple"}, {"id": 2, "r": 1, "c": 2, "dir": "down", "color": "amber"}, {"id": 3, "r": 2, "c": 2, "dir": "down", "color": "cyan"}, {"id": 4, "r": 1, "c": 1, "dir": "up", "color": "emerald"}, {"id": 5, "r": 2, "c": 1, "dir": "up", "color": "blue"}]}, {"id": 5, "title": "十字クロス", "hint": "あいているほうこうのやじるしをさがしてね", "rows": 4, "cols": 4, "items": [{"id": 1, "r": 0, "c": 0, "dir": "right", "color": "purple"}, {"id": 2, "r": 1, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 1, "c": 3, "dir": "up", "color": "cyan"}, {"id": 4, "r": 2, "c": 1, "dir": "right", "color": "emerald"}, {"id": 5, "r": 2, "c": 3, "dir": "up", "color": "blue"}, {"id": 6, "r": 3, "c": 2, "dir": "right", "color": "orange"}]}, {"id": 6, "title": "4×4ステップ", "hint": "すこしひろくなったよ！じっくりみてみよう", "rows": 4, "cols": 4, "items": [{"id": 1, "r": 0, "c": 1, "dir": "down", "color": "purple"}, {"id": 2, "r": 0, "c": 2, "dir": "right", "color": "amber"}, {"id": 3, "r": 1, "c": 1, "dir": "left", "color": "cyan"}, {"id": 4, "r": 1, "c": 2, "dir": "right", "color": "emerald"}, {"id": 5, "r": 1, "c": 0, "dir": "left", "color": "blue"}, {"id": 6, "r": 2, "c": 1, "dir": "down", "color": "orange"}, {"id": 7, "r": 2, "c": 2, "dir": "right", "color": "pink"}, {"id": 8, "r": 3, "c": 1, "dir": "down", "color": "purple"}]}, {"id": 7, "title": "ぐるぐるスピン", "hint": "そとがわから じゅんばんにとんでいくよ！", "rows": 4, "cols": 4, "items": [{"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 2, "dir": "right", "color": "amber"}, {"id": 3, "r": 1, "c": 0, "dir": "up", "color": "cyan"}, {"id": 4, "r": 1, "c": 1, "dir": "right", "color": "emerald"}, {"id": 5, "r": 1, "c": 3, "dir": "right", "color": "blue"}, {"id": 6, "r": 2, "c": 0, "dir": "down", "color": "orange"}, {"id": 7, "r": 2, "c": 2, "dir": "right", "color": "pink"}, {"id": 8, "r": 2, "c": 3, "dir": "right", "color": "purple"}, {"id": 9, "r": 3, "c": 0, "dir": "down", "color": "amber"}, {"id": 10, "r": 3, "c": 1, "dir": "down", "color": "cyan"}]}, {"id": 8, "title": "おじゃま岩登場！", "hint": "グレーのいわにはぶつかるよ！いわをさけてね", "rows": 5, "cols": 5, "items": [{"id": "rock_0", "type": "rock", "r": 2, "c": 2}, {"id": 1, "r": 0, "c": 2, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 3, "dir": "up", "color": "amber"}, {"id": 3, "r": 1, "c": 0, "dir": "up", "color": "cyan"}, {"id": 4, "r": 1, "c": 1, "dir": "up", "color": "emerald"}, {"id": 5, "r": 1, "c": 2, "dir": "up", "color": "blue"}, {"id": 6, "r": 1, "c": 3, "dir": "right", "color": "orange"}, {"id": 7, "r": 2, "c": 1, "dir": "left", "color": "pink"}, {"id": 8, "r": 2, "c": 4, "dir": "down", "color": "purple"}, {"id": 9, "r": 3, "c": 0, "dir": "down", "color": "amber"}, {"id": 10, "r": 3, "c": 3, "dir": "down", "color": "cyan"}, {"id": 11, "r": 4, "c": 0, "dir": "down", "color": "emerald"}, {"id": 12, "r": 4, "c": 3, "dir": "down", "color": "blue"}]}, {"id": 9, "title": "ふたつの岩パズル", "hint": "ふたつのいわをよくみて じゅんばんをかんがえよう", "rows": 5, "cols": 5, "items": [{"id": "rock_0", "type": "rock", "r": 1, "c": 2}, {"id": "rock_1", "type": "rock", "r": 3, "c": 2}, {"id": 1, "r": 0, "c": 1, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 2, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 4, "dir": "down", "color": "cyan"}, {"id": 4, "r": 1, "c": 1, "dir": "up", "color": "emerald"}, {"id": 5, "r": 1, "c": 3, "dir": "down", "color": "blue"}, {"id": 6, "r": 1, "c": 4, "dir": "down", "color": "orange"}, {"id": 7, "r": 2, "c": 0, "dir": "left", "color": "pink"}, {"id": 8, "r": 2, "c": 1, "dir": "left", "color": "purple"}, {"id": 9, "r": 2, "c": 2, "dir": "right", "color": "amber"}, {"id": 10, "r": 2, "c": 3, "dir": "right", "color": "cyan"}, {"id": 11, "r": 2, "c": 4, "dir": "down", "color": "emerald"}, {"id": 12, "r": 3, "c": 1, "dir": "down", "color": "blue"}, {"id": 13, "r": 3, "c": 3, "dir": "down", "color": "orange"}, {"id": 14, "r": 4, "c": 1, "dir": "down", "color": "pink"}, {"id": 15, "r": 4, "c": 3, "dir": "down", "color": "purple"}]}, {"id": 10, "title": "5×5大連鎖！", "hint": "20このブロックをぜんぶシュシュッととばそう！", "rows": 5, "cols": 5, "items": [{"id": "rock_0", "type": "rock", "r": 1, "c": 1}, {"id": "rock_1", "type": "rock", "r": 3, "c": 3}, {"id": 1, "r": 0, "c": 1, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 2, "dir": "down", "color": "amber"}, {"id": 3, "r": 0, "c": 4, "dir": "right", "color": "cyan"}, {"id": 4, "r": 1, "c": 0, "dir": "up", "color": "emerald"}, {"id": 5, "r": 1, "c": 2, "dir": "right", "color": "blue"}, {"id": 6, "r": 1, "c": 3, "dir": "right", "color": "orange"}, {"id": 7, "r": 1, "c": 4, "dir": "right", "color": "pink"}, {"id": 8, "r": 2, "c": 0, "dir": "up", "color": "purple"}, {"id": 9, "r": 2, "c": 1, "dir": "down", "color": "amber"}, {"id": 10, "r": 2, "c": 2, "dir": "down", "color": "cyan"}, {"id": 11, "r": 2, "c": 4, "dir": "down", "color": "emerald"}, {"id": 12, "r": 3, "c": 0, "dir": "left", "color": "blue"}, {"id": 13, "r": 3, "c": 1, "dir": "left", "color": "orange"}, {"id": 14, "r": 3, "c": 2, "dir": "left", "color": "pink"}, {"id": 15, "r": 3, "c": 4, "dir": "down", "color": "purple"}, {"id": 16, "r": 4, "c": 0, "dir": "down", "color": "amber"}, {"id": 17, "r": 4, "c": 2, "dir": "down", "color": "cyan"}, {"id": 18, "r": 4, "c": 4, "dir": "down", "color": "emerald"}]}, {"id": 11, "title": "6×6へ突入！", "hint": "ひろい盤面に挑戦！まわりから少しずつあけよう", "rows": 6, "cols": 6, "items": [{"id": "rock_0", "type": "rock", "r": 2, "c": 2}, {"id": "rock_1", "type": "rock", "r": 3, "c": 3}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 3, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 4, "dir": "up", "color": "emerald"}, {"id": 5, "r": 1, "c": 1, "dir": "up", "color": "blue"}, {"id": 6, "r": 1, "c": 3, "dir": "up", "color": "orange"}, {"id": 7, "r": 1, "c": 4, "dir": "up", "color": "pink"}, {"id": 8, "r": 1, "c": 5, "dir": "down", "color": "purple"}, {"id": 9, "r": 2, "c": 1, "dir": "up", "color": "amber"}, {"id": 10, "r": 2, "c": 4, "dir": "up", "color": "cyan"}, {"id": 11, "r": 2, "c": 5, "dir": "down", "color": "emerald"}, {"id": 12, "r": 3, "c": 0, "dir": "left", "color": "blue"}, {"id": 13, "r": 3, "c": 1, "dir": "down", "color": "orange"}, {"id": 14, "r": 3, "c": 5, "dir": "down", "color": "pink"}, {"id": 15, "r": 4, "c": 0, "dir": "left", "color": "purple"}, {"id": 16, "r": 4, "c": 1, "dir": "down", "color": "amber"}, {"id": 17, "r": 4, "c": 2, "dir": "down", "color": "cyan"}, {"id": 18, "r": 4, "c": 5, "dir": "down", "color": "emerald"}, {"id": 19, "r": 5, "c": 1, "dir": "down", "color": "blue"}, {"id": 20, "r": 5, "c": 2, "dir": "down", "color": "orange"}]}, {"id": 12, "title": "ブロックタワー", "hint": "たてとよこのラインをしっかりみきわめよう", "rows": 6, "cols": 6, "items": [{"id": "rock_0", "type": "rock", "r": 1, "c": 2}, {"id": "rock_1", "type": "rock", "r": 4, "c": 3}, {"id": 1, "r": 0, "c": 1, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 2, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 3, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 5, "dir": "down", "color": "emerald"}, {"id": 5, "r": 1, "c": 1, "dir": "up", "color": "blue"}, {"id": 6, "r": 1, "c": 4, "dir": "down", "color": "orange"}, {"id": 7, "r": 1, "c": 5, "dir": "down", "color": "pink"}, {"id": 8, "r": 2, "c": 1, "dir": "up", "color": "purple"}, {"id": 9, "r": 2, "c": 2, "dir": "down", "color": "amber"}, {"id": 10, "r": 2, "c": 4, "dir": "down", "color": "cyan"}, {"id": 11, "r": 2, "c": 5, "dir": "down", "color": "emerald"}, {"id": 12, "r": 3, "c": 0, "dir": "left", "color": "blue"}, {"id": 13, "r": 3, "c": 1, "dir": "up", "color": "orange"}, {"id": 14, "r": 3, "c": 2, "dir": "down", "color": "pink"}, {"id": 15, "r": 3, "c": 3, "dir": "right", "color": "purple"}, {"id": 16, "r": 3, "c": 4, "dir": "right", "color": "amber"}, {"id": 17, "r": 3, "c": 5, "dir": "down", "color": "cyan"}, {"id": 18, "r": 4, "c": 0, "dir": "down", "color": "emerald"}, {"id": 19, "r": 4, "c": 1, "dir": "left", "color": "blue"}, {"id": 20, "r": 4, "c": 2, "dir": "down", "color": "orange"}, {"id": 21, "r": 4, "c": 4, "dir": "right", "color": "pink"}, {"id": 22, "r": 4, "c": 5, "dir": "right", "color": "purple"}, {"id": 23, "r": 5, "c": 0, "dir": "down", "color": "amber"}, {"id": 24, "r": 5, "c": 2, "dir": "down", "color": "cyan"}, {"id": 25, "r": 5, "c": 3, "dir": "down", "color": "emerald"}]}, {"id": 13, "title": "迷宮アロー", "hint": "矢印がぎっしり！出口への道を見つけ出そう", "rows": 6, "cols": 6, "items": [{"id": "rock_0", "type": "rock", "r": 2, "c": 1}, {"id": "rock_1", "type": "rock", "r": 3, "c": 4}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 2, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 3, "dir": "right", "color": "emerald"}, {"id": 5, "r": 0, "c": 4, "dir": "up", "color": "blue"}, {"id": 6, "r": 0, "c": 5, "dir": "right", "color": "orange"}, {"id": 7, "r": 1, "c": 0, "dir": "up", "color": "pink"}, {"id": 8, "r": 1, "c": 1, "dir": "up", "color": "purple"}, {"id": 9, "r": 1, "c": 2, "dir": "up", "color": "amber"}, {"id": 10, "r": 1, "c": 4, "dir": "up", "color": "cyan"}, {"id": 11, "r": 1, "c": 5, "dir": "down", "color": "emerald"}, {"id": 12, "r": 2, "c": 0, "dir": "left", "color": "blue"}, {"id": 13, "r": 2, "c": 2, "dir": "down", "color": "orange"}, {"id": 14, "r": 2, "c": 3, "dir": "down", "color": "pink"}, {"id": 15, "r": 2, "c": 4, "dir": "up", "color": "purple"}, {"id": 16, "r": 2, "c": 5, "dir": "down", "color": "amber"}, {"id": 17, "r": 3, "c": 0, "dir": "down", "color": "cyan"}, {"id": 18, "r": 3, "c": 1, "dir": "down", "color": "emerald"}, {"id": 19, "r": 3, "c": 2, "dir": "down", "color": "blue"}, {"id": 20, "r": 3, "c": 3, "dir": "down", "color": "orange"}, {"id": 21, "r": 3, "c": 5, "dir": "down", "color": "pink"}, {"id": 22, "r": 4, "c": 0, "dir": "down", "color": "purple"}, {"id": 23, "r": 4, "c": 1, "dir": "down", "color": "amber"}, {"id": 24, "r": 4, "c": 2, "dir": "down", "color": "cyan"}, {"id": 25, "r": 4, "c": 3, "dir": "down", "color": "emerald"}, {"id": 26, "r": 4, "c": 4, "dir": "right", "color": "blue"}, {"id": 27, "r": 5, "c": 0, "dir": "down", "color": "orange"}, {"id": 28, "r": 5, "c": 1, "dir": "down", "color": "pink"}]}, {"id": 14, "title": "7×7メガステージ", "hint": "7×7の大盤面！すき間から順番に崩していこう", "rows": 7, "cols": 7, "items": [{"id": "rock_0", "type": "rock", "r": 2, "c": 2}, {"id": "rock_1", "type": "rock", "r": 4, "c": 4}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "right", "color": "amber"}, {"id": 3, "r": 0, "c": 2, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 3, "dir": "right", "color": "emerald"}, {"id": 5, "r": 0, "c": 5, "dir": "up", "color": "blue"}, {"id": 6, "r": 0, "c": 6, "dir": "down", "color": "orange"}, {"id": 7, "r": 1, "c": 0, "dir": "up", "color": "pink"}, {"id": 8, "r": 1, "c": 2, "dir": "up", "color": "purple"}, {"id": 9, "r": 1, "c": 4, "dir": "right", "color": "amber"}, {"id": 10, "r": 1, "c": 5, "dir": "up", "color": "cyan"}, {"id": 11, "r": 1, "c": 6, "dir": "down", "color": "emerald"}, {"id": 12, "r": 2, "c": 0, "dir": "left", "color": "blue"}, {"id": 13, "r": 2, "c": 1, "dir": "left", "color": "orange"}, {"id": 14, "r": 2, "c": 3, "dir": "down", "color": "pink"}, {"id": 15, "r": 2, "c": 5, "dir": "right", "color": "purple"}, {"id": 16, "r": 2, "c": 6, "dir": "down", "color": "amber"}, {"id": 17, "r": 3, "c": 0, "dir": "down", "color": "cyan"}, {"id": 18, "r": 3, "c": 1, "dir": "down", "color": "emerald"}, {"id": 19, "r": 3, "c": 2, "dir": "left", "color": "blue"}, {"id": 20, "r": 3, "c": 3, "dir": "down", "color": "orange"}, {"id": 21, "r": 3, "c": 5, "dir": "right", "color": "pink"}, {"id": 22, "r": 3, "c": 6, "dir": "down", "color": "purple"}, {"id": 23, "r": 4, "c": 0, "dir": "down", "color": "amber"}, {"id": 24, "r": 4, "c": 1, "dir": "down", "color": "cyan"}, {"id": 25, "r": 4, "c": 3, "dir": "down", "color": "emerald"}, {"id": 26, "r": 4, "c": 5, "dir": "right", "color": "blue"}, {"id": 27, "r": 4, "c": 6, "dir": "down", "color": "orange"}, {"id": 28, "r": 5, "c": 0, "dir": "down", "color": "pink"}, {"id": 29, "r": 5, "c": 1, "dir": "down", "color": "purple"}, {"id": 30, "r": 5, "c": 3, "dir": "down", "color": "amber"}, {"id": 31, "r": 5, "c": 4, "dir": "down", "color": "cyan"}, {"id": 32, "r": 6, "c": 3, "dir": "down", "color": "emerald"}]}, {"id": 15, "title": "カラフルストーム", "hint": "岩の周りをうまくよけて矢印を飛ばそう！", "rows": 7, "cols": 7, "items": [{"id": "rock_0", "type": "rock", "r": 2, "c": 3}, {"id": "rock_1", "type": "rock", "r": 4, "c": 2}, {"id": "rock_2", "type": "rock", "r": 3, "c": 5}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 2, "dir": "right", "color": "cyan"}, {"id": 4, "r": 0, "c": 4, "dir": "up", "color": "emerald"}, {"id": 5, "r": 0, "c": 6, "dir": "down", "color": "blue"}, {"id": 6, "r": 1, "c": 0, "dir": "up", "color": "orange"}, {"id": 7, "r": 1, "c": 1, "dir": "up", "color": "pink"}, {"id": 8, "r": 1, "c": 3, "dir": "up", "color": "purple"}, {"id": 9, "r": 1, "c": 4, "dir": "up", "color": "amber"}, {"id": 10, "r": 1, "c": 5, "dir": "right", "color": "cyan"}, {"id": 11, "r": 1, "c": 6, "dir": "down", "color": "emerald"}, {"id": 12, "r": 2, "c": 0, "dir": "up", "color": "blue"}, {"id": 13, "r": 2, "c": 1, "dir": "up", "color": "orange"}, {"id": 14, "r": 2, "c": 2, "dir": "down", "color": "pink"}, {"id": 15, "r": 2, "c": 4, "dir": "right", "color": "purple"}, {"id": 16, "r": 2, "c": 6, "dir": "down", "color": "amber"}, {"id": 17, "r": 3, "c": 0, "dir": "up", "color": "cyan"}, {"id": 18, "r": 3, "c": 1, "dir": "up", "color": "emerald"}, {"id": 19, "r": 3, "c": 3, "dir": "down", "color": "blue"}, {"id": 20, "r": 3, "c": 4, "dir": "down", "color": "orange"}, {"id": 21, "r": 4, "c": 0, "dir": "down", "color": "pink"}, {"id": 22, "r": 4, "c": 1, "dir": "left", "color": "purple"}, {"id": 23, "r": 4, "c": 3, "dir": "down", "color": "amber"}, {"id": 24, "r": 4, "c": 4, "dir": "down", "color": "cyan"}, {"id": 25, "r": 4, "c": 5, "dir": "down", "color": "emerald"}, {"id": 26, "r": 4, "c": 6, "dir": "down", "color": "blue"}, {"id": 27, "r": 5, "c": 0, "dir": "down", "color": "orange"}, {"id": 28, "r": 5, "c": 1, "dir": "down", "color": "pink"}, {"id": 29, "r": 5, "c": 2, "dir": "down", "color": "purple"}, {"id": 30, "r": 5, "c": 3, "dir": "down", "color": "amber"}, {"id": 31, "r": 5, "c": 4, "dir": "down", "color": "cyan"}, {"id": 32, "r": 5, "c": 5, "dir": "down", "color": "emerald"}, {"id": 33, "r": 5, "c": 6, "dir": "down", "color": "blue"}, {"id": 34, "r": 6, "c": 0, "dir": "down", "color": "orange"}]}, {"id": 16, "title": "アローフォレスト", "hint": "40個のブロック！外側から一枚ずつ皮をむくように", "rows": 7, "cols": 7, "items": [{"id": "rock_0", "type": "rock", "r": 1, "c": 2}, {"id": "rock_1", "type": "rock", "r": 3, "c": 4}, {"id": "rock_2", "type": "rock", "r": 5, "c": 2}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 2, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 3, "dir": "up", "color": "emerald"}, {"id": 5, "r": 0, "c": 4, "dir": "up", "color": "blue"}, {"id": 6, "r": 0, "c": 5, "dir": "up", "color": "orange"}, {"id": 7, "r": 0, "c": 6, "dir": "down", "color": "pink"}, {"id": 8, "r": 1, "c": 0, "dir": "up", "color": "purple"}, {"id": 9, "r": 1, "c": 1, "dir": "up", "color": "amber"}, {"id": 10, "r": 1, "c": 3, "dir": "up", "color": "cyan"}, {"id": 11, "r": 1, "c": 4, "dir": "up", "color": "emerald"}, {"id": 12, "r": 1, "c": 5, "dir": "up", "color": "blue"}, {"id": 13, "r": 1, "c": 6, "dir": "down", "color": "orange"}, {"id": 14, "r": 2, "c": 0, "dir": "left", "color": "pink"}, {"id": 15, "r": 2, "c": 1, "dir": "up", "color": "purple"}, {"id": 16, "r": 2, "c": 2, "dir": "down", "color": "amber"}, {"id": 17, "r": 2, "c": 3, "dir": "down", "color": "cyan"}, {"id": 18, "r": 2, "c": 4, "dir": "down", "color": "emerald"}, {"id": 19, "r": 2, "c": 5, "dir": "down", "color": "blue"}, {"id": 20, "r": 2, "c": 6, "dir": "down", "color": "orange"}, {"id": 21, "r": 3, "c": 0, "dir": "down", "color": "pink"}, {"id": 22, "r": 3, "c": 1, "dir": "left", "color": "purple"}, {"id": 23, "r": 3, "c": 2, "dir": "down", "color": "amber"}, {"id": 24, "r": 3, "c": 3, "dir": "down", "color": "cyan"}, {"id": 25, "r": 3, "c": 5, "dir": "down", "color": "emerald"}, {"id": 26, "r": 4, "c": 0, "dir": "down", "color": "blue"}, {"id": 27, "r": 4, "c": 1, "dir": "left", "color": "orange"}, {"id": 28, "r": 4, "c": 3, "dir": "down", "color": "pink"}, {"id": 29, "r": 4, "c": 4, "dir": "down", "color": "purple"}, {"id": 30, "r": 4, "c": 5, "dir": "down", "color": "amber"}, {"id": 31, "r": 5, "c": 0, "dir": "down", "color": "cyan"}, {"id": 32, "r": 5, "c": 3, "dir": "down", "color": "emerald"}, {"id": 33, "r": 5, "c": 4, "dir": "down", "color": "blue"}, {"id": 34, "r": 5, "c": 5, "dir": "down", "color": "orange"}, {"id": 35, "r": 6, "c": 0, "dir": "down", "color": "pink"}, {"id": 36, "r": 6, "c": 3, "dir": "down", "color": "purple"}, {"id": 37, "r": 6, "c": 4, "dir": "down", "color": "amber"}]}, {"id": 17, "title": "8×8マスター開幕！", "hint": "ついに8×8超広大ワールドへ突入！じっくり挑もう", "rows": 8, "cols": 8, "items": [{"id": "rock_0", "type": "rock", "r": 2, "c": 2}, {"id": "rock_1", "type": "rock", "r": 5, "c": 5}, {"id": "rock_2", "type": "rock", "r": 2, "c": 5}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 2, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 3, "dir": "up", "color": "emerald"}, {"id": 5, "r": 0, "c": 4, "dir": "up", "color": "blue"}, {"id": 6, "r": 0, "c": 5, "dir": "up", "color": "orange"}, {"id": 7, "r": 0, "c": 6, "dir": "up", "color": "pink"}, {"id": 8, "r": 0, "c": 7, "dir": "down", "color": "purple"}, {"id": 9, "r": 1, "c": 0, "dir": "up", "color": "amber"}, {"id": 10, "r": 1, "c": 1, "dir": "up", "color": "cyan"}, {"id": 11, "r": 1, "c": 3, "dir": "up", "color": "emerald"}, {"id": 12, "r": 1, "c": 4, "dir": "up", "color": "blue"}, {"id": 13, "r": 1, "c": 6, "dir": "up", "color": "orange"}, {"id": 14, "r": 1, "c": 7, "dir": "down", "color": "pink"}, {"id": 15, "r": 2, "c": 0, "dir": "left", "color": "purple"}, {"id": 16, "r": 2, "c": 1, "dir": "left", "color": "amber"}, {"id": 17, "r": 2, "c": 3, "dir": "down", "color": "cyan"}, {"id": 18, "r": 2, "c": 4, "dir": "down", "color": "emerald"}, {"id": 19, "r": 2, "c": 6, "dir": "right", "color": "blue"}, {"id": 20, "r": 2, "c": 7, "dir": "down", "color": "orange"}, {"id": 21, "r": 3, "c": 0, "dir": "down", "color": "pink"}, {"id": 22, "r": 3, "c": 1, "dir": "left", "color": "purple"}, {"id": 23, "r": 3, "c": 2, "dir": "down", "color": "amber"}, {"id": 24, "r": 3, "c": 3, "dir": "down", "color": "cyan"}, {"id": 25, "r": 3, "c": 4, "dir": "down", "color": "emerald"}, {"id": 26, "r": 3, "c": 5, "dir": "down", "color": "blue"}, {"id": 27, "r": 3, "c": 6, "dir": "right", "color": "orange"}, {"id": 28, "r": 3, "c": 7, "dir": "down", "color": "pink"}, {"id": 29, "r": 4, "c": 0, "dir": "down", "color": "purple"}, {"id": 30, "r": 4, "c": 1, "dir": "left", "color": "amber"}, {"id": 31, "r": 4, "c": 2, "dir": "down", "color": "cyan"}, {"id": 32, "r": 4, "c": 3, "dir": "down", "color": "emerald"}, {"id": 33, "r": 4, "c": 4, "dir": "down", "color": "blue"}, {"id": 34, "r": 4, "c": 5, "dir": "down", "color": "orange"}, {"id": 35, "r": 4, "c": 6, "dir": "right", "color": "pink"}, {"id": 36, "r": 4, "c": 7, "dir": "down", "color": "purple"}, {"id": 37, "r": 5, "c": 0, "dir": "down", "color": "amber"}, {"id": 38, "r": 5, "c": 2, "dir": "down", "color": "cyan"}, {"id": 39, "r": 5, "c": 3, "dir": "down", "color": "emerald"}, {"id": 40, "r": 5, "c": 4, "dir": "down", "color": "blue"}, {"id": 41, "r": 5, "c": 6, "dir": "right", "color": "orange"}, {"id": 42, "r": 6, "c": 0, "dir": "down", "color": "pink"}, {"id": 43, "r": 6, "c": 2, "dir": "down", "color": "purple"}, {"id": 44, "r": 6, "c": 3, "dir": "down", "color": "amber"}]}, {"id": 18, "title": "大要塞パズル", "hint": "4つの岩と大量のブロック！落ち着いて解きほぐそう", "rows": 8, "cols": 8, "items": [{"id": "rock_0", "type": "rock", "r": 2, "c": 2}, {"id": "rock_1", "type": "rock", "r": 2, "c": 5}, {"id": "rock_2", "type": "rock", "r": 5, "c": 2}, {"id": "rock_3", "type": "rock", "r": 5, "c": 5}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 2, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 3, "dir": "up", "color": "emerald"}, {"id": 5, "r": 0, "c": 4, "dir": "up", "color": "blue"}, {"id": 6, "r": 0, "c": 5, "dir": "up", "color": "orange"}, {"id": 7, "r": 0, "c": 6, "dir": "up", "color": "pink"}, {"id": 8, "r": 0, "c": 7, "dir": "down", "color": "purple"}, {"id": 9, "r": 1, "c": 0, "dir": "up", "color": "amber"}, {"id": 10, "r": 1, "c": 1, "dir": "up", "color": "cyan"}, {"id": 11, "r": 1, "c": 3, "dir": "up", "color": "emerald"}, {"id": 12, "r": 1, "c": 4, "dir": "up", "color": "blue"}, {"id": 13, "r": 1, "c": 6, "dir": "up", "color": "orange"}, {"id": 14, "r": 1, "c": 7, "dir": "down", "color": "pink"}, {"id": 15, "r": 2, "c": 0, "dir": "up", "color": "purple"}, {"id": 16, "r": 2, "c": 1, "dir": "up", "color": "amber"}, {"id": 17, "r": 2, "c": 3, "dir": "down", "color": "cyan"}, {"id": 18, "r": 2, "c": 4, "dir": "down", "color": "emerald"}, {"id": 19, "r": 2, "c": 6, "dir": "right", "color": "blue"}, {"id": 20, "r": 2, "c": 7, "dir": "down", "color": "orange"}, {"id": 21, "r": 3, "c": 0, "dir": "left", "color": "pink"}, {"id": 22, "r": 3, "c": 1, "dir": "left", "color": "purple"}, {"id": 23, "r": 3, "c": 2, "dir": "down", "color": "amber"}, {"id": 24, "r": 3, "c": 3, "dir": "down", "color": "cyan"}, {"id": 25, "r": 3, "c": 4, "dir": "down", "color": "emerald"}, {"id": 26, "r": 3, "c": 5, "dir": "down", "color": "blue"}, {"id": 27, "r": 3, "c": 6, "dir": "right", "color": "orange"}, {"id": 28, "r": 3, "c": 7, "dir": "down", "color": "pink"}, {"id": 29, "r": 4, "c": 0, "dir": "down", "color": "purple"}, {"id": 30, "r": 4, "c": 1, "dir": "down", "color": "amber"}, {"id": 31, "r": 4, "c": 2, "dir": "down", "color": "cyan"}, {"id": 32, "r": 4, "c": 3, "dir": "down", "color": "emerald"}, {"id": 33, "r": 4, "c": 4, "dir": "down", "color": "blue"}, {"id": 34, "r": 4, "c": 5, "dir": "down", "color": "orange"}, {"id": 35, "r": 4, "c": 6, "dir": "right", "color": "pink"}, {"id": 36, "r": 4, "c": 7, "dir": "down", "color": "purple"}, {"id": 37, "r": 5, "c": 0, "dir": "down", "color": "amber"}, {"id": 38, "r": 5, "c": 1, "dir": "down", "color": "cyan"}, {"id": 39, "r": 5, "c": 3, "dir": "down", "color": "emerald"}, {"id": 40, "r": 5, "c": 4, "dir": "down", "color": "blue"}, {"id": 41, "r": 5, "c": 6, "dir": "down", "color": "orange"}, {"id": 42, "r": 5, "c": 7, "dir": "down", "color": "pink"}, {"id": 43, "r": 6, "c": 0, "dir": "down", "color": "purple"}, {"id": 44, "r": 6, "c": 1, "dir": "down", "color": "amber"}, {"id": 45, "r": 6, "c": 3, "dir": "down", "color": "cyan"}, {"id": 46, "r": 6, "c": 4, "dir": "down", "color": "emerald"}, {"id": 47, "r": 6, "c": 7, "dir": "down", "color": "blue"}]}, {"id": 19, "title": "グランドブラスト", "hint": "約50個の矢印！連鎖が止まらない爽快感！", "rows": 8, "cols": 8, "items": [{"id": "rock_0", "type": "rock", "r": 1, "c": 3}, {"id": "rock_1", "type": "rock", "r": 3, "c": 6}, {"id": "rock_2", "type": "rock", "r": 6, "c": 2}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 2, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 3, "dir": "up", "color": "emerald"}, {"id": 5, "r": 0, "c": 4, "dir": "up", "color": "blue"}, {"id": 6, "r": 0, "c": 5, "dir": "up", "color": "orange"}, {"id": 7, "r": 0, "c": 6, "dir": "up", "color": "pink"}, {"id": 8, "r": 0, "c": 7, "dir": "down", "color": "purple"}, {"id": 9, "r": 1, "c": 0, "dir": "up", "color": "amber"}, {"id": 10, "r": 1, "c": 1, "dir": "up", "color": "cyan"}, {"id": 11, "r": 1, "c": 2, "dir": "up", "color": "emerald"}, {"id": 12, "r": 1, "c": 4, "dir": "up", "color": "blue"}, {"id": 13, "r": 1, "c": 5, "dir": "up", "color": "orange"}, {"id": 14, "r": 1, "c": 6, "dir": "up", "color": "pink"}, {"id": 15, "r": 1, "c": 7, "dir": "down", "color": "purple"}, {"id": 16, "r": 2, "c": 0, "dir": "up", "color": "amber"}, {"id": 17, "r": 2, "c": 1, "dir": "up", "color": "cyan"}, {"id": 18, "r": 2, "c": 2, "dir": "up", "color": "emerald"}, {"id": 19, "r": 2, "c": 3, "dir": "down", "color": "blue"}, {"id": 20, "r": 2, "c": 4, "dir": "down", "color": "orange"}, {"id": 21, "r": 2, "c": 5, "dir": "right", "color": "pink"}, {"id": 22, "r": 2, "c": 6, "dir": "down", "color": "purple"}, {"id": 23, "r": 2, "c": 7, "dir": "down", "color": "amber"}, {"id": 24, "r": 3, "c": 0, "dir": "left", "color": "cyan"}, {"id": 25, "r": 3, "c": 1, "dir": "down", "color": "emerald"}, {"id": 26, "r": 3, "c": 2, "dir": "down", "color": "blue"}, {"id": 27, "r": 3, "c": 3, "dir": "down", "color": "orange"}, {"id": 28, "r": 3, "c": 4, "dir": "down", "color": "pink"}, {"id": 29, "r": 3, "c": 5, "dir": "down", "color": "purple"}, {"id": 30, "r": 3, "c": 7, "dir": "down", "color": "amber"}, {"id": 31, "r": 4, "c": 0, "dir": "down", "color": "cyan"}, {"id": 32, "r": 4, "c": 1, "dir": "down", "color": "emerald"}, {"id": 33, "r": 4, "c": 2, "dir": "down", "color": "blue"}, {"id": 34, "r": 4, "c": 3, "dir": "down", "color": "orange"}, {"id": 35, "r": 4, "c": 4, "dir": "down", "color": "pink"}, {"id": 36, "r": 4, "c": 5, "dir": "down", "color": "purple"}, {"id": 37, "r": 4, "c": 7, "dir": "down", "color": "amber"}, {"id": 38, "r": 5, "c": 0, "dir": "down", "color": "cyan"}, {"id": 39, "r": 5, "c": 1, "dir": "down", "color": "emerald"}, {"id": 40, "r": 5, "c": 2, "dir": "down", "color": "blue"}, {"id": 41, "r": 5, "c": 3, "dir": "down", "color": "orange"}, {"id": 42, "r": 5, "c": 4, "dir": "down", "color": "pink"}, {"id": 43, "r": 5, "c": 5, "dir": "down", "color": "purple"}, {"id": 44, "r": 5, "c": 7, "dir": "down", "color": "amber"}, {"id": 45, "r": 6, "c": 0, "dir": "down", "color": "cyan"}, {"id": 46, "r": 6, "c": 1, "dir": "down", "color": "emerald"}, {"id": 47, "r": 6, "c": 4, "dir": "down", "color": "blue"}, {"id": 48, "r": 6, "c": 5, "dir": "down", "color": "orange"}]}, {"id": 20, "title": "究極のパズルマスター！", "hint": "最終ステージ！すべての矢印を解き放とう！", "rows": 8, "cols": 8, "items": [{"id": "rock_0", "type": "rock", "r": 2, "c": 2}, {"id": "rock_1", "type": "rock", "r": 2, "c": 5}, {"id": "rock_2", "type": "rock", "r": 5, "c": 2}, {"id": "rock_3", "type": "rock", "r": 5, "c": 5}, {"id": 1, "r": 0, "c": 0, "dir": "up", "color": "purple"}, {"id": 2, "r": 0, "c": 1, "dir": "up", "color": "amber"}, {"id": 3, "r": 0, "c": 2, "dir": "up", "color": "cyan"}, {"id": 4, "r": 0, "c": 3, "dir": "up", "color": "emerald"}, {"id": 5, "r": 0, "c": 4, "dir": "up", "color": "blue"}, {"id": 6, "r": 0, "c": 5, "dir": "up", "color": "orange"}, {"id": 7, "r": 0, "c": 6, "dir": "up", "color": "pink"}, {"id": 8, "r": 0, "c": 7, "dir": "down", "color": "purple"}, {"id": 9, "r": 1, "c": 0, "dir": "up", "color": "amber"}, {"id": 10, "r": 1, "c": 1, "dir": "up", "color": "cyan"}, {"id": 11, "r": 1, "c": 3, "dir": "up", "color": "emerald"}, {"id": 12, "r": 1, "c": 4, "dir": "up", "color": "blue"}, {"id": 13, "r": 1, "c": 6, "dir": "up", "color": "orange"}, {"id": 14, "r": 1, "c": 7, "dir": "down", "color": "pink"}, {"id": 15, "r": 2, "c": 0, "dir": "left", "color": "purple"}, {"id": 16, "r": 2, "c": 1, "dir": "left", "color": "amber"}, {"id": 17, "r": 2, "c": 3, "dir": "down", "color": "cyan"}, {"id": 18, "r": 2, "c": 4, "dir": "down", "color": "emerald"}, {"id": 19, "r": 2, "c": 6, "dir": "right", "color": "blue"}, {"id": 20, "r": 2, "c": 7, "dir": "down", "color": "orange"}, {"id": 21, "r": 3, "c": 0, "dir": "left", "color": "pink"}, {"id": 22, "r": 3, "c": 1, "dir": "down", "color": "purple"}, {"id": 23, "r": 3, "c": 2, "dir": "down", "color": "amber"}, {"id": 24, "r": 3, "c": 3, "dir": "down", "color": "cyan"}, {"id": 25, "r": 3, "c": 4, "dir": "down", "color": "emerald"}, {"id": 26, "r": 3, "c": 5, "dir": "down", "color": "blue"}, {"id": 27, "r": 3, "c": 6, "dir": "right", "color": "orange"}, {"id": 28, "r": 3, "c": 7, "dir": "down", "color": "pink"}, {"id": 29, "r": 4, "c": 0, "dir": "down", "color": "purple"}, {"id": 30, "r": 4, "c": 1, "dir": "down", "color": "amber"}, {"id": 31, "r": 4, "c": 2, "dir": "down", "color": "cyan"}, {"id": 32, "r": 4, "c": 3, "dir": "down", "color": "emerald"}, {"id": 33, "r": 4, "c": 4, "dir": "down", "color": "blue"}, {"id": 34, "r": 4, "c": 5, "dir": "down", "color": "orange"}, {"id": 35, "r": 4, "c": 6, "dir": "right", "color": "pink"}, {"id": 36, "r": 4, "c": 7, "dir": "down", "color": "purple"}, {"id": 37, "r": 5, "c": 0, "dir": "down", "color": "amber"}, {"id": 38, "r": 5, "c": 1, "dir": "down", "color": "cyan"}, {"id": 39, "r": 5, "c": 3, "dir": "down", "color": "emerald"}, {"id": 40, "r": 5, "c": 4, "dir": "down", "color": "blue"}, {"id": 41, "r": 6, "c": 0, "dir": "down", "color": "orange"}, {"id": 42, "r": 6, "c": 1, "dir": "down", "color": "pink"}, {"id": 43, "r": 6, "c": 3, "dir": "down", "color": "purple"}];
-
-    // カラーパレット定義
     const COLOR_THEMES = {
-      orange: { bg: 'bg-gradient-to-br from-amber-400 to-orange-500', border: 'border-orange-300', hex: '#F97316' },
-      blue: { bg: 'bg-gradient-to-br from-sky-400 to-blue-600', border: 'border-sky-300', hex: '#2563EB' },
-      emerald: { bg: 'bg-gradient-to-br from-emerald-400 to-teal-600', border: 'border-emerald-300', hex: '#059669' },
-      pink: { bg: 'bg-gradient-to-br from-pink-400 to-rose-500', border: 'border-pink-300', hex: '#E11D48' },
-      purple: { bg: 'bg-gradient-to-br from-purple-400 to-indigo-600', border: 'border-purple-300', hex: '#7C3AED' },
-      amber: { bg: 'bg-gradient-to-br from-yellow-300 to-amber-500', border: 'border-yellow-200', hex: '#D97706' },
-      cyan: { bg: 'bg-gradient-to-br from-cyan-400 to-teal-500', border: 'border-cyan-200', hex: '#0891B2' }
+      orange: { bg: "bg-gradient-to-br from-amber-400 to-orange-500", border: "border-orange-300", hex: "#F97316" },
+      blue: { bg: "bg-gradient-to-br from-sky-400 to-blue-600", border: "border-sky-300", hex: "#2563EB" },
+      emerald: { bg: "bg-gradient-to-br from-emerald-400 to-teal-600", border: "border-emerald-300", hex: "#059669" },
+      pink: { bg: "bg-gradient-to-br from-pink-400 to-rose-500", border: "border-pink-300", hex: "#E11D48" },
+      purple: { bg: "bg-gradient-to-br from-purple-400 to-indigo-600", border: "border-purple-300", hex: "#7C3AED" },
+      amber: { bg: "bg-gradient-to-br from-yellow-300 to-amber-500", border: "border-yellow-200", hex: "#D97706" },
+      cyan: { bg: "bg-gradient-to-br from-cyan-400 to-teal-500", border: "border-cyan-200", hex: "#0891B2" }
     };
 
     function getArrowSvg(dir) {
       let rotation = 0;
-      if (dir === 'right') rotation = 90;
-      else if (dir === 'down') rotation = 180;
-      else if (dir === 'left') rotation = 270;
+      if (dir === "right") rotation = 90;
+      else if (dir === "down") rotation = 180;
+      else if (dir === "left") rotation = 270;
 
       return `
-        <svg class="text-white drop-shadow-md transition-transform" style="transform: rotate(${rotation}deg); width: 65%; height: 65%;" viewBox="0 0 24 24" fill="currentColor">
+        <svg class="text-white drop-shadow-sm" style="width: 65%; height: 65%; transform: rotate(${rotation}deg);" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2.5a1.5 1.5 0 0 1 1.06.44l7 7a1.5 1.5 0 0 1-2.12 2.12L13.5 7.62V20a1.5 1.5 0 0 1-3 0V7.62l-4.44 4.44a1.5 1.5 0 0 1-2.12-2.12l7-7A1.5 1.5 0 0 1 12 2.5z"/>
         </svg>
       `;
     }
 
-    // --- ゲーム状態管理 ---
-    let currentLevelIndex = 0;
+    // --- ゲーム進行状態 ---
+    let currentLevelNumber = 1;
     let isEndlessMode = false;
     let currentBoard = null;
     let comboCount = 0;
+    let moveHistory = []; // 1手もどす (Undo) 用スタック
 
-    const STORAGE_KEY = 'gogo_blast_save_v2';
+    const STORAGE_KEY = "gogo_blast_save_v3";
     let saveData = {
       unlockedLevel: 1,
       completedLevels: {}
@@ -591,7 +864,7 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === 'object') {
+          if (parsed && typeof parsed === "object") {
             saveData = { ...saveData, ...parsed };
           }
         }
@@ -608,92 +881,22 @@
       }
     }
 
-    // --- むげんモード用：100%解ける広大パズルのランダム自動生成 ---
-    function generateEndlessLevel() {
-      const rows = 8, cols = 8;
-      const board = Array.from({ length: rows }, () => Array(cols).fill(null));
-      const placedItems = [];
-      const colorKeys = Object.keys(COLOR_THEMES);
-
-      // ランダムに障害物の岩を3〜4個配置
-      const rockCount = 4;
-      for (let i = 0; i < rockCount; i++) {
-        let r, c;
-        do {
-          r = 1 + Math.floor(Math.random() * (rows - 2));
-          c = 1 + Math.floor(Math.random() * (cols - 2));
-        } while (board[r][c] !== null);
-        board[r][c] = { type: 'rock' };
-        placedItems.push({ id: `rock_${i}`, type: 'rock', r, c });
-      }
-
-      // 逆算シミュレーションで必ず解ける矢印を40〜48個配置
-      const DIRS = [
-        { dir: 'up', dr: -1, dc: 0 },
-        { dir: 'down', dr: 1, dc: 0 },
-        { dir: 'left', dr: 0, dc: -1 },
-        { dir: 'right', dr: 0, dc: 1 }
-      ];
-
-      let attempts = 0;
-      let arrowId = 1;
-      const targetCount = 46;
-
-      while (placedItems.filter(it => it.type !== 'rock').length < targetCount && attempts < 1200) {
-        attempts++;
-        const r = Math.floor(Math.random() * rows);
-        const c = Math.floor(Math.random() * cols);
-        if (board[r][c] !== null) continue;
-
-        // このマスから画面外まで何もない方向を探索
-        const validDirs = [];
-        for (const d of DIRS) {
-          let cr = r + d.dr;
-          let cc = c + d.dc;
-          let blocked = false;
-          while (cr >= 0 && cr < rows && cc >= 0 && cc < cols) {
-            if (board[cr][cc] !== null) {
-              blocked = true;
-              break;
-            }
-            cr += d.dr;
-            cc += d.dc;
-          }
-          if (!blocked) validDirs.push(d.dir);
-        }
-
-        if (validDirs.length > 0) {
-          const chosenDir = validDirs[Math.floor(Math.random() * validDirs.length)];
-          const color = colorKeys[(arrowId - 1) % colorKeys.length];
-          board[r][c] = { id: arrowId, dir: chosenDir };
-          placedItems.push({ id: arrowId, r, c, dir: chosenDir, color });
-          arrowId++;
-        }
-      }
-
-      return {
-        id: 'endless',
-        title: 'むげんチャレンジ！',
-        hint: '8×8の巨大パズル！外側から順番に飛ばそう！',
-        rows,
-        cols,
-        items: placedItems
-      };
-    }
-
-    // --- レベル初期化 & レンダリング ---
-    function initLevel(index, isEndless = false) {
-      isEndlessMode = isEndless;
-      currentLevelIndex = index;
+    // --- レベル初期化 ---
+    function initLevel(lvlNum, isEndless = false) {
       comboCount = 0;
+      moveHistory = [];
+      updateUndoButtonState();
 
       let levelDef;
       if (isEndless) {
+        isEndlessMode = true;
         levelDef = generateEndlessLevel();
-        document.getElementById('levelBadge').textContent = `むげん`;
+        document.getElementById("levelBadge").textContent = "むげん";
       } else {
-        levelDef = LEVELS[index];
-        document.getElementById('levelBadge').textContent = `Lv. ${levelDef.id} / ${LEVELS.length}`;
+        isEndlessMode = false;
+        currentLevelNumber = Math.max(1, Math.min(lvlNum, MAX_LEVELS));
+        levelDef = generateLevel(currentLevelNumber);
+        document.getElementById("levelBadge").textContent = `Lv. ${currentLevelNumber} / ${MAX_LEVELS}`;
       }
 
       currentBoard = {
@@ -702,62 +905,84 @@
         items: JSON.parse(JSON.stringify(levelDef.items))
       };
 
-      document.getElementById('levelTitle').textContent = levelDef.title;
-      document.getElementById('hintText').textContent = levelDef.hint;
+      document.getElementById("levelTitle").textContent = levelDef.title;
+      document.getElementById("hintText").textContent = levelDef.hint;
       updateRemainCount();
+      updateHeaderNavButtons();
 
       renderGridBackground(levelDef.rows, levelDef.cols);
       renderBoard();
     }
 
+    function updateHeaderNavButtons() {
+      const prevBtn = document.getElementById("prevLevelBtn");
+      const nextBtn = document.getElementById("nextLevelBtnHeader");
+
+      if (isEndlessMode) {
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+      } else {
+        prevBtn.disabled = currentLevelNumber <= 1;
+        // 次のレベルはアンロック済みなら進める
+        nextBtn.disabled = currentLevelNumber >= MAX_LEVELS || currentLevelNumber >= saveData.unlockedLevel;
+      }
+    }
+
+    function updateUndoButtonState() {
+      const undoBtn = document.getElementById("undoBtn");
+      undoBtn.disabled = moveHistory.length === 0;
+    }
+
     function renderGridBackground(rows, cols) {
-      const bg = document.getElementById('gridBackground');
-      bg.innerHTML = '';
-      bg.style.display = 'grid';
+      const bg = document.getElementById("gridBackground");
+      bg.innerHTML = "";
+      bg.style.display = "grid";
       bg.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
       bg.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      bg.style.gap = rows >= 7 ? '3px' : '5px';
-      bg.style.padding = rows >= 7 ? '3px' : '5px';
+      bg.style.gap = rows >= 7 ? "3px" : "5px";
+      bg.style.padding = rows >= 7 ? "3px" : "5px";
+
+      const radiusClass = rows >= 7 ? "rounded-md" : (rows >= 5 ? "rounded-xl" : "rounded-2xl");
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const cell = document.createElement('div');
-          cell.className = `bg-slate-200/50 border border-slate-300/40 ${rows >= 7 ? 'rounded-lg' : 'rounded-xl'}`;
+          const cell = document.createElement("div");
+          cell.className = `${radiusClass} bg-slate-200/50 border border-slate-300/30`;
           bg.appendChild(cell);
         }
       }
     }
 
     function updateRemainCount() {
-      const arrowsLeft = currentBoard.items.filter(item => item.type !== 'rock' && !item.isFlying).length;
-      document.getElementById('remainCount').textContent = arrowsLeft;
+      const arrowsLeft = currentBoard.items.filter(item => item.type !== "rock" && !item.isFlying).length;
+      document.getElementById("remainCount").textContent = arrowsLeft;
     }
 
     function renderBoard() {
-      const container = document.getElementById('boardContainer');
-      container.innerHTML = '';
+      const container = document.getElementById("boardContainer");
+      container.innerHTML = "";
 
       const { rows, cols, items } = currentBoard;
       const cellW = 100 / cols;
       const cellH = 100 / rows;
-      const pad = rows >= 7 ? '2px' : '3px';
-      const radius = rows >= 7 ? 'rounded-lg' : 'rounded-xl';
+      const pad = rows >= 7 ? "2px" : "3px";
+      const radiusClass = rows >= 7 ? "rounded-lg" : (rows >= 5 ? "rounded-xl" : "rounded-2xl");
 
       items.forEach(item => {
-        const el = document.createElement('div');
+        const el = document.createElement("div");
         el.id = `item-${item.id}`;
-        el.style.position = 'absolute';
+        el.style.position = "absolute";
         el.style.left = `${item.c * cellW}%`;
         el.style.top = `${item.r * cellH}%`;
         el.style.width = `${cellW}%`;
         el.style.height = `${cellH}%`;
         el.style.padding = pad;
 
-        const inner = document.createElement('div');
-        inner.className = `w-full h-full ${radius} flex items-center justify-center relative transition-transform`;
+        const inner = document.createElement("div");
+        inner.className = `w-full h-full ${radiusClass} flex items-center justify-center relative transition-transform`;
 
-        if (item.type === 'rock') {
-          inner.className += ' rock-3d border border-slate-400';
+        if (item.type === "rock") {
+          inner.className += " rock-3d border border-slate-400";
           inner.innerHTML = `
             <svg class="text-slate-200 drop-shadow" style="width: 60%; height: 60%;" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.5 9.5L15 4H9L4.5 9.5L3 16l4 4h10l4-4-1.5-6.5z"/>
@@ -768,7 +993,7 @@
           inner.className += ` block-3d ${theme.bg} border ${theme.border}`;
           inner.innerHTML = getArrowSvg(item.dir);
 
-          el.addEventListener('pointerdown', (e) => {
+          el.addEventListener("pointerdown", (e) => {
             e.preventDefault();
             handleBlockTap(item);
           });
@@ -779,11 +1004,10 @@
       });
     }
 
-    // --- 衝突チェック & アクション ---
     function checkCanFly(arrow) {
       const { r, c, dir } = arrow;
-      const dr = dir === 'up' ? -1 : dir === 'down' ? 1 : 0;
-      const dc = dir === 'left' ? -1 : dir === 'right' ? 1 : 0;
+      const dr = dir === "up" ? -1 : (dir === "down" ? 1 : 0);
+      const dc = dir === "left" ? -1 : (dir === "right" ? 1 : 0);
 
       let curR = r + dr;
       let curC = c + dc;
@@ -808,6 +1032,16 @@
       const inner = el.firstElementChild;
 
       if (canFly) {
+        // 1手もどす用の履歴にプッシュ
+        moveHistory.push({
+          id: arrow.id,
+          r: arrow.r,
+          c: arrow.c,
+          dir: arrow.dir,
+          color: arrow.color
+        });
+        updateUndoButtonState();
+
         arrow.isFlying = true;
         comboCount++;
         playLaunchSound(comboCount);
@@ -834,16 +1068,59 @@
         setTimeout(() => {
           inner.classList.remove(`shaking-${arrow.dir}`);
           arrow.isShaking = false;
-        }, 310);
+        }, 320);
       }
     }
 
+    // --- 1手もどす (Undo) 処理 ---
+    function handleUndo() {
+      if (moveHistory.length === 0) return;
+      playUndoSound();
+
+      const lastMove = moveHistory.pop();
+      updateUndoButtonState();
+
+      // currentBoard.items に追加
+      currentBoard.items.push(lastMove);
+      updateRemainCount();
+
+      // DOM に復元（ポップインアニメーション付き）
+      const container = document.getElementById("boardContainer");
+      const { rows, cols } = currentBoard;
+      const cellW = 100 / cols;
+      const cellH = 100 / rows;
+      const pad = rows >= 7 ? "2px" : "3px";
+      const radiusClass = rows >= 7 ? "rounded-lg" : (rows >= 5 ? "rounded-xl" : "rounded-2xl");
+
+      const el = document.createElement("div");
+      el.id = `item-${lastMove.id}`;
+      el.style.position = "absolute";
+      el.style.left = `${lastMove.c * cellW}%`;
+      el.style.top = `${lastMove.r * cellH}%`;
+      el.style.width = `${cellW}%`;
+      el.style.height = `${cellH}%`;
+      el.style.padding = pad;
+
+      const inner = document.createElement("div");
+      const theme = COLOR_THEMES[lastMove.color] || COLOR_THEMES.orange;
+      inner.className = `w-full h-full ${radiusClass} block-3d ${theme.bg} border ${theme.border} flex items-center justify-center relative anim-pop-in`;
+      inner.innerHTML = getArrowSvg(lastMove.dir);
+
+      el.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        handleBlockTap(lastMove);
+      });
+
+      el.appendChild(inner);
+      container.appendChild(el);
+    }
+
     function checkLevelClear() {
-      const remainingArrows = currentBoard.items.filter(it => it.type !== 'rock' && !it.isFlying);
+      const remainingArrows = currentBoard.items.filter(it => it.type !== "rock" && !it.isFlying);
       if (remainingArrows.length === 0) {
         setTimeout(() => {
           handleLevelComplete();
-        }, 200);
+        }, 180);
       }
     }
 
@@ -852,167 +1129,248 @@
       spawnConfetti();
 
       if (!isEndlessMode) {
-        const levelId = LEVELS[currentLevelIndex].id;
-        saveData.completedLevels[levelId] = 3;
-        if (currentLevelIndex + 1 < LEVELS.length) {
-          saveData.unlockedLevel = Math.max(saveData.unlockedLevel, levelId + 1);
+        saveData.completedLevels[currentLevelNumber] = 3;
+        if (currentLevelNumber + 1 <= MAX_LEVELS) {
+          saveData.unlockedLevel = Math.max(saveData.unlockedLevel, currentLevelNumber + 1);
         }
         saveGameData();
+        updateHeaderNavButtons();
       }
 
-      const heading = document.getElementById('clearModalHeading');
-      const desc = document.getElementById('clearModalDesc');
-      const nextBtn = document.getElementById('nextLevelBtn');
+      const heading = document.getElementById("clearModalHeading");
+      const desc = document.getElementById("clearModalDesc");
+      const nextBtn = document.getElementById("nextLevelBtn");
 
       if (isEndlessMode) {
-        heading.textContent = "むげんステージクリア！🎉";
-        desc.innerHTML = "8×8の巨大パズルを見事制覇！<br>次も新しい巨大パズルに挑戦しよう！🌟";
+        heading.textContent = "むげんパズル制覇！🎉";
+        desc.innerHTML = "8×8の超広大パズルを見事クリア！<br>次も新しい巨大パズルに挑戦しよう！🌟";
         nextBtn.textContent = "次のむげんステージへ 🚀";
-      } else if (currentLevelIndex + 1 >= LEVELS.length) {
-        heading.textContent = "全20ステージ制覇！🏆";
-        desc.innerHTML = "すべてのレベルをクリアしたよ！<br>きみは本物のパズルマスターだ！🌟";
-        nextBtn.textContent = "むげんチャレンジで遊ぶ 🚀";
+      } else if (currentLevelNumber >= MAX_LEVELS) {
+        heading.textContent = "全500レベル完全制覇！👑";
+        desc.innerHTML = "500ステージすべてのパズルを制覇しました！<br>あなたは真のパズル神です！🏆✨";
+        nextBtn.textContent = "むげんパズルで遊ぶ 🚀";
       } else {
-        heading.textContent = "たいへんよくできました！";
-        desc.innerHTML = "ぜんぶのやじるしが とんでいったよ！<br>つぎのステージに ちょうせんしよう！";
+        heading.textContent = "ステージクリア！";
+        desc.innerHTML = `レベル ${currentLevelNumber} をクリアしたよ！<br>つぎのレベル ${currentLevelNumber + 1} に挑戦しよう！`;
         nextBtn.textContent = "つぎのレベルへ GO! 🚀";
       }
 
-      document.getElementById('clearModal').classList.remove('hidden');
+      document.getElementById("clearModal").classList.remove("hidden");
     }
 
-    // --- レベル選択モーダル ---
-    function openLevelSelectModal() {
-      const modal = document.getElementById('levelModal');
-      const grid = document.getElementById('levelGrid');
-      grid.innerHTML = '';
+    // --- ステージ選択モーダル (全500レベル対応・タブ分割) ---
+    let activePage = 1; // 1 = 1〜50, 2 = 51〜100, etc.
+    const LEVELS_PER_PAGE = 50;
 
-      LEVELS.forEach((lvl, idx) => {
-        const isUnlocked = lvl.id <= saveData.unlockedLevel;
-        const isCompleted = saveData.completedLevels[lvl.id] !== undefined;
+    function renderStageSelectTabs() {
+      const tabsContainer = document.getElementById("pageTabsContainer");
+      tabsContainer.innerHTML = "";
 
-        const btn = document.createElement('button');
-        btn.className = `p-2.5 rounded-2xl flex flex-col items-center justify-between border-2 transition-all text-center relative ${
-          isUnlocked 
-            ? 'btn-3d bg-indigo-50 border-indigo-200 hover:bg-indigo-100 text-indigo-900 cursor-pointer' 
-            : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60 cursor-not-allowed'
+      const totalPages = Math.ceil(MAX_LEVELS / LEVELS_PER_PAGE);
+      for (let p = 1; p <= totalPages; p++) {
+        const startLvl = (p - 1) * LEVELS_PER_PAGE + 1;
+        const endLvl = Math.min(p * LEVELS_PER_PAGE, MAX_LEVELS);
+
+        const tabBtn = document.createElement("button");
+        tabBtn.className = `px-3 py-1.5 rounded-xl font-black text-xs whitespace-nowrap transition-all border ${
+          p === activePage
+            ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+            : "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200"
+        }`;
+        tabBtn.textContent = `${startLvl}〜${endLvl}`;
+
+        tabBtn.addEventListener("click", () => {
+          playClickSound();
+          activePage = p;
+          renderStageSelectTabs();
+          renderStageGrid();
+        });
+
+        tabsContainer.appendChild(tabBtn);
+      }
+    }
+
+    function renderStageGrid() {
+      const grid = document.getElementById("levelGrid");
+      grid.innerHTML = "";
+
+      const startLvl = (activePage - 1) * LEVELS_PER_PAGE + 1;
+      const endLvl = Math.min(activePage * LEVELS_PER_PAGE, MAX_LEVELS);
+
+      for (let lvl = startLvl; lvl <= endLvl; lvl++) {
+        const isUnlocked = lvl <= saveData.unlockedLevel;
+        const isCompleted = saveData.completedLevels[lvl] !== undefined;
+
+        const btn = document.createElement("button");
+        btn.className = `p-2 rounded-xl flex flex-col items-center justify-center border-2 transition-all text-center relative aspect-square ${
+          isUnlocked
+            ? "btn-3d bg-indigo-50 border-indigo-200 hover:bg-indigo-100 text-indigo-900 cursor-pointer"
+            : "bg-slate-100 border-slate-200 text-slate-400 opacity-60 cursor-not-allowed"
         }`;
 
-        if (!isEndlessMode && idx === currentLevelIndex) {
-          btn.className += ' ring-4 ring-amber-400';
+        if (!isEndlessMode && lvl === currentLevelNumber) {
+          btn.className += " ring-3 ring-amber-400 bg-amber-50 border-amber-300";
         }
 
         btn.innerHTML = `
-          <div class="flex items-center justify-between w-full mb-1">
-            <span class="font-black text-xs sm:text-sm">Lv.${lvl.id}</span>
-            <span class="text-xs">${isUnlocked ? (isCompleted ? '⭐️⭐️⭐️' : '✨') : '🔒'}</span>
-          </div>
-          <div class="font-bold text-xs truncate w-full text-slate-700">${lvl.title}</div>
+          <span class="font-black text-xs sm:text-sm">${lvl}</span>
+          <span class="text-[10px] mt-0.5">${isUnlocked ? (isCompleted ? "⭐️" : "✨") : "🔒"}</span>
         `;
 
         if (isUnlocked) {
-          btn.addEventListener('click', () => {
+          btn.addEventListener("click", () => {
             playClickSound();
-            initLevel(idx, false);
-            modal.classList.add('hidden');
+            initLevel(lvl, false);
+            document.getElementById("levelModal").classList.add("hidden");
           });
         }
 
         grid.appendChild(btn);
-      });
-
-      document.getElementById('resetConfirmBanner').classList.add('hidden');
-      modal.classList.remove('hidden');
+      }
     }
 
-    // --- 初期ロードとイベント ---
-    document.addEventListener('DOMContentLoaded', () => {
+    function openLevelSelectModal() {
+      // 現在のレベルが含まれるページを初期選択
+      if (!isEndlessMode) {
+        activePage = Math.ceil(currentLevelNumber / LEVELS_PER_PAGE);
+      } else {
+        activePage = Math.ceil(saveData.unlockedLevel / LEVELS_PER_PAGE);
+      }
+      activePage = Math.max(1, Math.min(activePage, Math.ceil(MAX_LEVELS / LEVELS_PER_PAGE)));
+
+      document.getElementById("jumpCurrentText").textContent = `Lv.${saveData.unlockedLevel}へジャンプ`;
+      renderStageSelectTabs();
+      renderStageGrid();
+
+      document.getElementById("resetConfirmBanner").classList.add("hidden");
+      document.getElementById("levelModal").classList.remove("hidden");
+    }
+
+    // --- イベントリスナー初期化 ---
+    document.addEventListener("DOMContentLoaded", () => {
       loadSaveData();
 
-      const initialLevel = Math.min(saveData.unlockedLevel - 1, LEVELS.length - 1);
-      initLevel(initialLevel >= 0 ? initialLevel : 0, false);
+      const initialLvl = Math.min(saveData.unlockedLevel, MAX_LEVELS);
+      initLevel(initialLvl, false);
 
-      document.getElementById('retryBtn').addEventListener('click', () => {
-        playClickSound();
-        initLevel(currentLevelIndex, isEndlessMode);
+      // 1手もどす (Undo)
+      document.getElementById("undoBtn").addEventListener("click", () => {
+        handleUndo();
       });
 
-      const soundBtn = document.getElementById('soundToggleBtn');
-      const soundOn = document.getElementById('soundIconOn');
-      const soundOff = document.getElementById('soundIconOff');
-      soundBtn.addEventListener('click', () => {
-        soundEnabled = !soundEnabled;
-        if (soundEnabled) {
-          soundOn.classList.remove('hidden');
-          soundOff.classList.add('hidden');
+      // リトライ
+      document.getElementById("retryBtn").addEventListener("click", () => {
+        playClickSound();
+        initLevel(currentLevelNumber, isEndlessMode);
+      });
+
+      // 前のレベル ◀️
+      document.getElementById("prevLevelBtn").addEventListener("click", () => {
+        if (currentLevelNumber > 1 && !isEndlessMode) {
           playClickSound();
-        } else {
-          soundOn.classList.add('hidden');
-          soundOff.classList.remove('hidden');
+          initLevel(currentLevelNumber - 1, false);
         }
       });
 
-      document.getElementById('levelSelectBtn').addEventListener('click', () => {
+      // 次のレベル ▶️
+      document.getElementById("nextLevelBtnHeader").addEventListener("click", () => {
+        if (currentLevelNumber < saveData.unlockedLevel && !isEndlessMode) {
+          playClickSound();
+          initLevel(currentLevelNumber + 1, false);
+        }
+      });
+
+      // サウンド切り替え
+      const soundBtn = document.getElementById("soundToggleBtn");
+      const soundOn = document.getElementById("soundIconOn");
+      const soundOff = document.getElementById("soundIconOff");
+      soundBtn.addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        if (soundEnabled) {
+          soundOn.classList.remove("hidden");
+          soundOff.classList.add("hidden");
+          playClickSound();
+        } else {
+          soundOn.classList.add("hidden");
+          soundOff.classList.remove("hidden");
+        }
+      });
+
+      // ステージ一覧モーダル開閉
+      document.getElementById("levelSelectBtn").addEventListener("click", () => {
         playClickSound();
         openLevelSelectModal();
       });
 
-      document.getElementById('endlessModeBtn').addEventListener('click', () => {
+      document.getElementById("closeLevelModalBtn").addEventListener("click", () => {
         playClickSound();
-        initLevel(0, true);
-        document.getElementById('levelModal').classList.add('hidden');
+        document.getElementById("levelModal").classList.add("hidden");
       });
 
-      document.getElementById('closeLevelModalBtn').addEventListener('click', () => {
+      // 現在地ジャンプボタン
+      document.getElementById("jumpCurrentBtn").addEventListener("click", () => {
         playClickSound();
-        document.getElementById('levelModal').classList.add('hidden');
+        activePage = Math.ceil(saveData.unlockedLevel / LEVELS_PER_PAGE);
+        renderStageSelectTabs();
+        renderStageGrid();
       });
 
-      document.getElementById('nextLevelBtn').addEventListener('click', () => {
+      // むげんチャレンジボタン
+      document.getElementById("endlessBtn").addEventListener("click", () => {
         playClickSound();
-        document.getElementById('clearModal').classList.add('hidden');
+        document.getElementById("levelModal").classList.add("hidden");
+        initLevel(1, true);
+      });
+
+      // クリアモーダル 次のレベルへ
+      document.getElementById("nextLevelBtn").addEventListener("click", () => {
+        playClickSound();
+        document.getElementById("clearModal").classList.add("hidden");
         if (isEndlessMode) {
-          initLevel(0, true);
-        } else if (currentLevelIndex + 1 < LEVELS.length) {
-          initLevel(currentLevelIndex + 1, false);
+          initLevel(1, true);
+        } else if (currentLevelNumber < MAX_LEVELS) {
+          initLevel(currentLevelNumber + 1, false);
         } else {
-          initLevel(0, true);
+          initLevel(1, true);
         }
       });
 
-      document.getElementById('replayClearBtn').addEventListener('click', () => {
+      // クリアモーダル もう一度あそぶ
+      document.getElementById("replayClearBtn").addEventListener("click", () => {
         playClickSound();
-        document.getElementById('clearModal').classList.add('hidden');
-        initLevel(currentLevelIndex, isEndlessMode);
+        document.getElementById("clearModal").classList.add("hidden");
+        initLevel(currentLevelNumber, isEndlessMode);
       });
 
-      document.getElementById('helpBtn').addEventListener('click', () => {
+      // あそびかたモーダル
+      document.getElementById("helpBtn").addEventListener("click", () => {
         playClickSound();
-        document.getElementById('helpModal').classList.remove('hidden');
+        document.getElementById("helpModal").classList.remove("hidden");
       });
-      document.getElementById('closeHelpModalBtn').addEventListener('click', () => {
+      document.getElementById("closeHelpModalBtn").addEventListener("click", () => {
         playClickSound();
-        document.getElementById('helpModal').classList.add('hidden');
-      });
-
-      const resetBanner = document.getElementById('resetConfirmBanner');
-      document.getElementById('resetDataBtn').addEventListener('click', () => {
-        playClickSound();
-        resetBanner.classList.toggle('hidden');
+        document.getElementById("helpModal").classList.add("hidden");
       });
 
-      document.getElementById('confirmResetYes').addEventListener('click', () => {
+      // セーブデータリセット
+      const resetBanner = document.getElementById("resetConfirmBanner");
+      document.getElementById("resetDataBtn").addEventListener("click", () => {
+        playClickSound();
+        resetBanner.classList.toggle("hidden");
+      });
+
+      document.getElementById("confirmResetYes").addEventListener("click", () => {
         playClickSound();
         saveData = { unlockedLevel: 1, completedLevels: {} };
         saveGameData();
-        initLevel(0, false);
-        resetBanner.classList.add('hidden');
-        document.getElementById('levelModal').classList.add('hidden');
+        initLevel(1, false);
+        resetBanner.classList.add("hidden");
+        document.getElementById("levelModal").classList.add("hidden");
       });
 
-      document.getElementById('confirmResetNo').addEventListener('click', () => {
+      document.getElementById("confirmResetNo").addEventListener("click", () => {
         playClickSound();
-        resetBanner.classList.add('hidden');
+        resetBanner.classList.add("hidden");
       });
     });
   </script>
