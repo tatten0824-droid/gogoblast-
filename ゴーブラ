@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GOGO! Blast - やじるしパズル</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, #E0F2FE 0%, #EDE9FE 50%, #FEF3C7 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .block-3d {
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18), 0 8px 12px rgba(0, 0, 0, 0.15), inset 0 3px 0 rgba(255, 255, 255, 0.45), inset 0 -3px 0 rgba(0, 0, 0, 0.15);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      cursor: pointer;
+    }
+    .block-3d:active {
+      transform: translateY(3px) scale(0.97);
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18), 0 4px 6px rgba(0, 0, 0, 0.15), inset 0 2px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .rock-3d {
+      background: linear-gradient(145deg, #94A3B8, #64748B);
+      box-shadow: 0 5px 0 #475569, 0 6px 10px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.3);
+    }
+
+    .btn-3d {
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2), 0 6px 8px rgba(0, 0, 0, 0.12);
+      transition: all 0.1s ease;
+    }
+    .btn-3d:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 3px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    @keyframes shake-up {
+      0%, 100% { transform: translateY(0); }
+      20% { transform: translateY(-12px); }
+      40% { transform: translateY(4px) rotate(-3deg); }
+      60% { transform: translateY(-4px) rotate(3deg); }
+      80% { transform: translateY(2px); }
+    }
+    @keyframes shake-down {
+      0%, 100% { transform: translateY(0); }
+      20% { transform: translateY(12px); }
+      40% { transform: translateY(-4px) rotate(-3deg); }
+      60% { transform: translateY(4px) rotate(3deg); }
+      80% { transform: translateY(-2px); }
+    }
+    @keyframes shake-left {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-12px); }
+      40% { transform: translateX(4px) rotate(-3deg); }
+      60% { transform: translateX(-4px) rotate(3deg); }
+      80% { transform: translateX(2px); }
+    }
+    @keyframes shake-right {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(12px); }
+      40% { transform: translateX(-4px) rotate(-3deg); }
+      60% { transform: translateX(4px) rotate(3deg); }
+      80% { transform: translateX(-2px); }
+    }
+
+    .shaking-up { animation: shake-up 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+    .shaking-down { animation: shake-down 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+    .shaking-left { animation: shake-left 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+    .shaking-right { animation: shake-right 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+    .fly-up {
+      transform: translateY(-800px) scale(1.15) !important;
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease-in !important;
+    }
+    .fly-down {
+      transform: translateY(800px) scale(1.15) !important;
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease-in !important;
+    }
+    .fly-left {
+      transform: translateX(-800px) scale(1.15) !important;
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease-in !important;
+    }
+    .fly-right {
+      transform: translateX(800px) scale(1.15) !important;
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease-in !important;
+    }
+
+    @keyframes star-pop {
+      0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+      70% { transform: scale(1.25) rotate(10deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .star-pop-1 { animation: star-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both; }
+    .star-pop-2 { animation: star-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s both; }
+    .star-pop-3 { animation: star-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s both; }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-between p-3 sm:p-5 select-none text-slate-800">
+
+  <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+  <header class="w-full max-w-md flex items-center justify-between gap-2 mb-2">
+    <div class="flex items-center gap-1.5">
+      <div class="bg-gradient-to-r from-pink-500 via-yellow-400 to-cyan-400 text-white font-black text-xl sm:text-2xl px-3 py-1 rounded-2xl shadow-md tracking-wider flex items-center gap-1 border-2 border-white">
+        <span>GOGO!</span>
+        <span class="text-yellow-200">BLAST</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button id="levelSelectBtn" class="btn-3d bg-indigo-500 hover:bg-indigo-600 text-white font-bold p-2.5 rounded-2xl flex items-center justify-center text-sm border-2 border-white" title="ステージをえらぶ">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <button id="retryBtn" class="btn-3d bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold p-2.5 rounded-2xl flex items-center justify-center text-sm border-2 border-white" title="やりなおす">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </button>
+
+      <button id="soundToggleBtn" class="btn-3d bg-emerald-400 hover:bg-emerald-500 text-emerald-950 font-bold p-2.5 rounded-2xl flex items-center justify-center text-sm border-2 border-white" title="おとのきりかえ">
+        <svg id="soundIconOn" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+        </svg>
+        <svg id="soundIconOff" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+        </svg>
+      </button>
+
+      <button id="helpBtn" class="btn-3d bg-sky-400 hover:bg-sky-500 text-sky-950 font-bold p-2.5 rounded-2xl flex items-center justify-center text-sm border-2 border-white" title="あそびかた">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl p-3 shadow-md border-2 border-white/80 flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2">
+      <span id="levelBadge" class="bg-gradient-to-r from-amber-400 to-orange-400 text-white font-black text-sm px-3 py-1 rounded-xl shadow-sm">
+        Lv. 1 / 10
+      </span>
+      <h2 id="levelTitle" class="text-base sm:text-lg font-black text-slate-700 tracking-wide">
+        はじめてのシュッ！
+      </h2>
+    </div>
+
+    <div class="flex items-center gap-1.5 bg-slate-100 px-3 py-1 rounded-xl">
+      <span class="text-xs font-bold text-slate-500">のこり</span>
+      <span id="remainCount" class="text-lg font-black text-indigo-600">2</span>
+    </div>
+  </div>
+
+  <main class="w-full max-w-md flex-1 flex flex-col items-center justify-center my-auto">
+    <div class="relative w-full aspect-square max-w-[420px] p-3 sm:p-4 bg-gradient-to-b from-white/95 to-slate-100/95 rounded-3xl shadow-xl border-4 border-white flex items-center justify-center overflow-hidden">
+      <div id="gridBackground" class="absolute inset-3 sm:inset-4 rounded-2xl bg-slate-100/80 border-2 border-dashed border-slate-300"></div>
+      <div id="boardContainer" class="relative w-full h-full z-10"></div>
+    </div>
+  </main>
+
+  <footer class="w-full max-w-md text-center py-2">
+    <p id="hintText" class="text-sm sm:text-base font-bold text-slate-600 bg-white/70 backdrop-blur-sm py-1.5 px-4 rounded-full inline-block shadow-sm border border-white">
+      あいている ほうこうへ シュッ！と とばそう！
+    </p>
+  </footer>
+
+  <div id="clearModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl border-4 border-amber-300 transform transition-all scale-95 duration-200">
+      <div class="inline-block bg-amber-100 text-amber-600 font-black text-sm px-4 py-1 rounded-full mb-2">
+        ステージクリア！
+      </div>
+      <h3 id="clearModalHeading" class="text-2xl sm:text-3xl font-black text-slate-800 mb-3">
+        たいへんよくできました！
+      </h3>
+
+      <div class="flex justify-center items-center gap-3 my-4">
+        <span class="text-5xl star-pop-1">⭐️</span>
+        <span class="text-6xl star-pop-2">⭐️</span>
+        <span class="text-5xl star-pop-3">⭐️</span>
+      </div>
+
+      <p id="clearModalDesc" class="text-slate-600 font-bold mb-6 text-sm sm:text-base">
+        ぜんぶのやじるしが とんでいったよ！<br>つぎのステージに ちょうせんしよう！
+      </p>
+
+      <div class="flex flex-col gap-3">
+        <button id="nextLevelBtn" class="btn-3d w-full py-3.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-black text-lg rounded-2xl shadow-lg border-2 border-white">
+          つぎのレベルへ GO! 🚀
+        </button>
+        <button id="replayClearBtn" class="btn-3d w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm">
+          もういちど あそぶ 🔄
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="levelModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl border-4 border-indigo-200 flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+          <span>🎯</span> ステージをえらぶ
+        </h3>
+        <button id="closeLevelModalBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-full">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="levelGrid" class="grid grid-cols-2 gap-2.5 overflow-y-auto p-1 flex-1"></div>
+
+      <div class="pt-3 border-t border-slate-100 mt-3 flex justify-between items-center text-xs text-slate-400 font-bold">
+        <span>データはじどうほぞんされています</span>
+        <button id="resetDataBtn" class="hover:text-red-500 underline">きろくをリセット</button>
+      </div>
+
+      <div id="resetConfirmBanner" class="hidden mt-2 p-2 bg-rose-50 border border-rose-200 rounded-xl text-center">
+        <p class="text-xs text-rose-700 font-bold mb-1.5">ほんとうに さいしょからにしますか？</p>
+        <div class="flex justify-center gap-2">
+          <button id="confirmResetYes" class="px-3 py-1 bg-rose-500 text-white rounded-lg text-xs font-black">はい</button>
+          <button id="confirmResetNo" class="px-3 py-1 bg-slate-200 text-slate-700 rounded-lg text-xs font-bold">やめる</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="helpModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border-4 border-sky-200 text-center">
+      <div class="text-4xl mb-2">🚀</div>
+      <h3 class="text-xl font-black text-slate-800 mb-3">あそびかた</h3>
+      
+      <div class="space-y-3 text-left text-sm font-bold text-slate-600 bg-sky-50 p-4 rounded-2xl mb-5">
+        <div class="flex items-start gap-2">
+          <span class="text-sky-500 font-black text-base">①</span>
+          <span>やじるしをタップすると、そのほうこうへ「シュッ！」と とんでいくよ！</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="text-sky-500 font-black text-base">②</span>
+          <span>まえにべつのやじるしや いわがあると、ぶつかって とべないよ。</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="text-sky-500 font-black text-base">③</span>
+          <span>まえがあいているやじるしから じゅんばんにタップして、ぜんぶクリアしよう！</span>
+        </div>
+      </div>
+
+      <button id="closeHelpModalBtn" class="btn-3d w-full py-3 bg-sky-400 hover:bg-sky-500 text-white font-black text-base rounded-xl border-2 border-white">
+        わかった！あそぶ！
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playLaunchSound(combo = 0) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const notes = [293.66, 329.63, 369.99, 392.00, 440.00, 493.88, 554.37, 587.33, 659.25, 739.99, 880.00, 987.77];
+        const baseFreq = notes[Math.min(combo, notes.length - 1)];
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(baseFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.4, now + 0.16);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.22);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(baseFreq * 2, now);
+        osc2.frequency.exponentialRampToValueAtTime(baseFreq * 3.5, now + 0.14);
+
+        gain2.gain.setValueAtTime(0.15, now);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now);
+        osc2.stop(now + 0.18);
+      } catch (e) {
+        console.error("Audio error:", e);
+      }
+    }
+
+    function playBounceSound() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + 0.12);
+
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.13);
+      } catch (e) {
+        console.error("Audio error:", e);
+      }
+    }
+
+    function playClearSound() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const t = now + i * 0.1;
+
+          osc.type = i === 3 ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+
+          gain.gain.setValueAtTime(0.28, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + (i === 3 ? 0.8 : 0.4));
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + (i === 3 ? 0.85 : 0.45));
+        });
+      } catch (e) {
+        console.error("Audio error:", e);
+      }
+    }
+
+    function playClickSound() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.06);
+      } catch (e) {
+        console.error("Audio error:", e);
+      }
+    }
+
+    const fxCanvas = document.getElementById('fxCanvas');
+    const fxCtx = fxCanvas.getContext('2d');
+    let particles = [];
+    let confetti = [];
+
+    function resizeCanvas() {
+      fxCanvas.width = window.innerWidth;
+      fxCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function spawnStarburst(x, y, color) {
+      const colors = [color, '#FDE047', '#FFFFFF', '#F472B6', '#38BDF8'];
+      for (let i = 0; i < 12; i++) {
+        const angle = (Math.PI * 2 / 12) * i + (Math.random() * 0.4 - 0.2);
+        const speed = 3 + Math.random() * 4;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: 5 + Math.random() * 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          decay: 0.03 + Math.random() * 0.02,
+          isStar: Math.random() > 0.4
+        });
+      }
+    }
+
+    function spawnConfetti() {
+      const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#FBBF24'];
+      for (let i = 0; i < 80; i++) {
+        confetti.push({
+          x: Math.random() * fxCanvas.width,
+          y: -20 - Math.random() * 50,
+          vx: (Math.random() - 0.5) * 4,
+          vy: 3 + Math.random() * 4,
+          size: 8 + Math.random() * 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 10,
+          alpha: 1
+        });
+      }
+    }
+
+    function updateFx() {
+      fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.95;
+        p.vy *= 0.95;
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        fxCtx.save();
+        fxCtx.globalAlpha = p.alpha;
+        fxCtx.fillStyle = p.color;
+        if (p.isStar) {
+          fxCtx.beginPath();
+          fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          fxCtx.fill();
+        } else {
+          fxCtx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+        }
+        fxCtx.restore();
+      }
+
+      for (let i = confetti.length - 1; i >= 0; i--) {
+        const c = confetti[i];
+        c.x += c.vx;
+        c.y += c.vy;
+        c.rotation += c.vRot;
+
+        if (c.y > fxCanvas.height + 30) {
+          confetti.splice(i, 1);
+          continue;
+        }
+
+        fxCtx.save();
+        fxCtx.translate(c.x, c.y);
+        fxCtx.rotate(c.rotation * Math.PI / 180);
+        fxCtx.fillStyle = c.color;
+        fxCtx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size * 0.6);
+        fxCtx.restore();
+      }
+
+      requestAnimationFrame(updateFx);
+    }
+    requestAnimationFrame(updateFx);
+
+    const LEVELS = [
+      {
+        id: 1,
+        title: "はじめてのシュッ！",
+        hint: "やじるしをタップしてそとにシュッ！ととばそう",
+        rows: 2,
+        cols: 2,
+        items: [
+          { id: 1, r: 0, c: 0, dir: 'up', color: 'orange' },
+          { id: 2, r: 1, c: 1, dir: 'down', color: 'blue' }
+        ]
+      },
+      {
+        id: 2,
+        title: "３つのやじるし",
+        hint: "ぜんぶそとをむいているよ！ポンポンおしてみよう",
+        rows: 3,
+        cols: 3,
+        items: [
+          { id: 1, r: 0, c: 1, dir: 'up', color: 'pink' },
+          { id: 2, r: 1, c: 0, dir: 'left', color: 'emerald' },
+          { id: 3, r: 1, c: 2, dir: 'right', color: 'amber' }
+        ]
+      },
+      {
+        id: 3,
+        title: "じゅんばんパズル",
+        hint: "まえにいるやじるしから さきにとばそう！",
+        rows: 3,
+        cols: 3,
+        items: [
+          { id: 1, r: 1, c: 0, dir: 'right', color: 'orange' },
+          { id: 2, r: 1, c: 2, dir: 'right', color: 'blue' }
+        ]
+      },
+      {
+        id: 4,
+        title: "たてのれんさ",
+        hint: "うえのやじるしから じゅんばんにとばそう！",
+        rows: 3,
+        cols: 3,
+        items: [
+          { id: 1, r: 0, c: 1, dir: 'up', color: 'purple' },
+          { id: 2, r: 1, c: 1, dir: 'up', color: 'emerald' },
+          { id: 3, r: 2, c: 1, dir: 'up', color: 'pink' }
+        ]
+      },
+      {
+        id: 5,
+        title: "十字クロス",
+        hint: "あいているほうこうのやじるしをさがしてね",
+        rows: 3,
+        cols: 3,
+        items: [
+          { id: 1, r: 0, c: 1, dir: 'right', color: 'orange' },
+          { id: 2, r: 1, c: 0, dir: 'down', color: 'blue' },
+          { id: 3, r: 1, c: 2, dir: 'up', color: 'emerald' },
+          { id: 4, r: 2, c: 1, dir: 'left', color: 'pink' }
+        ]
+      },
+      {
+        id: 6,
+        title: "4×4にちょうせん！",
+        hint: "すこしひろくなったよ！じっくりみてみよう",
+        rows: 4,
+        cols: 4,
+        items: [
+          { id: 1, r: 0, c: 1, dir: 'up', color: 'purple' },
+          { id: 2, r: 1, c: 1, dir: 'up', color: 'blue' },
+          { id: 3, r: 1, c: 2, dir: 'right', color: 'amber' },
+          { id: 4, r: 2, c: 2, dir: 'down', color: 'emerald' },
+          { id: 5, r: 2, c: 1, dir: 'left', color: 'pink' },
+          { id: 6, r: 3, c: 2, dir: 'down', color: 'orange' }
+        ]
+      },
+      {
+        id: 7,
+        title: "ぐるぐるスピン",
+        hint: "そとがわから じゅんばんにとんでいくよ！",
+        rows: 4,
+        cols: 4,
+        items: [
+          { id: 1, r: 0, c: 3, dir: 'up', color: 'emerald' },
+          { id: 2, r: 0, c: 1, dir: 'right', color: 'amber' },
+          { id: 3, r: 3, c: 0, dir: 'down', color: 'blue' },
+          { id: 4, r: 3, c: 2, dir: 'left', color: 'purple' },
+          { id: 5, r: 1, c: 0, dir: 'up', color: 'pink' },
+          { id: 6, r: 2, c: 3, dir: 'down', color: 'orange' },
+          { id: 7, r: 1, c: 2, dir: 'right', color: 'cyan' },
+          { id: 8, r: 2, c: 1, dir: 'left', color: 'emerald' }
+        ]
+      },
+      {
+        id: 8,
+        title: "おじゃま岩が登場！",
+        hint: "グレーのいわにはぶつかるよ！いわをさけてね",
+        rows: 4,
+        cols: 4,
+        items: [
+          { id: 'rock1', type: 'rock', r: 1, c: 1 },
+          { id: 1, r: 0, c: 1, dir: 'up', color: 'blue' },
+          { id: 2, r: 2, c: 1, dir: 'down', color: 'orange' },
+          { id: 3, r: 1, c: 0, dir: 'left', color: 'pink' },
+          { id: 4, r: 1, c: 2, dir: 'right', color: 'emerald' },
+          { id: 5, r: 0, c: 2, dir: 'right', color: 'amber' },
+          { id: 6, r: 2, c: 2, dir: 'right', color: 'purple' }
+        ]
+      },
+      {
+        id: 9,
+        title: "ふたつの岩パズル",
+        hint: "ふたつのいわをよくみて じゅんばんをかんがえよう",
+        rows: 5,
+        cols: 5,
+        items: [
+          { id: 'rock1', type: 'rock', r: 2, c: 1 },
+          { id: 'rock2', type: 'rock', r: 2, c: 3 },
+          { id: 1, r: 0, c: 1, dir: 'up', color: 'purple' },
+          { id: 2, r: 1, c: 1, dir: 'up', color: 'blue' },
+          { id: 3, r: 4, c: 3, dir: 'down', color: 'orange' },
+          { id: 4, r: 3, c: 3, dir: 'down', color: 'emerald' },
+          { id: 5, r: 2, c: 0, dir: 'left', color: 'pink' },
+          { id: 6, r: 2, c: 4, dir: 'right', color: 'amber' },
+          { id: 7, r: 1, c: 2, dir: 'right', color: 'cyan' },
+          { id: 8, r: 3, c: 2, dir: 'left', color: 'emerald' }
+        ]
+      },
+      {
+        id: 10,
+        title: "マスター！大れんさ！",
+        hint: "さいごのステージ！ぜんぶシュシュッととばそう！",
+        rows: 5,
+        cols: 5,
+        items: [
+          { id: 'rock1', type: 'rock', r: 1, c: 2 },
+          { id: 'rock2', type: 'rock', r: 3, c: 2 },
+          { id: 1, r: 0, c: 0, dir: 'up', color: 'pink' },
+          { id: 2, r: 0, c: 4, dir: 'right', color: 'orange' },
+          { id: 3, r: 4, c: 0, dir: 'left', color: 'blue' },
+          { id: 4, r: 4, c: 4, dir: 'down', color: 'emerald' },
+          { id: 5, r: 0, c: 2, dir: 'up', color: 'amber' },
+          { id: 6, r: 4, c: 2, dir: 'down', color: 'purple' },
+          { id: 7, r: 2, c: 0, dir: 'left', color: 'cyan' },
+          { id: 8, r: 2, c: 4, dir: 'right', color: 'pink' },
+          { id: 9, r: 1, c: 1, dir: 'left', color: 'emerald' },
+          { id: 10, r: 1, c: 3, dir: 'right', color: 'orange' },
+          { id: 11, r: 3, c: 1, dir: 'left', color: 'blue' },
+          { id: 12, r: 3, c: 3, dir: 'right', color: 'amber' }
+        ]
+      }
+    ];
+
+    const COLOR_THEMES = {
+      orange: { bg: 'bg-gradient-to-br from-amber-400 to-orange-500', border: 'border-orange-300', hex: '#F97316' },
+      blue: { bg: 'bg-gradient-to-br from-sky-400 to-blue-600', border: 'border-sky-300', hex: '#2563EB' },
+      emerald: { bg: 'bg-gradient-to-br from-emerald-400 to-teal-600', border: 'border-emerald-300', hex: '#059669' },
+      pink: { bg: 'bg-gradient-to-br from-pink-400 to-rose-500', border: 'border-pink-300', hex: '#E11D48' },
+      purple: { bg: 'bg-gradient-to-br from-purple-400 to-indigo-600', border: 'border-purple-300', hex: '#7C3AED' },
+      amber: { bg: 'bg-gradient-to-br from-yellow-300 to-amber-500', border: 'border-yellow-200', hex: '#D97706' },
+      cyan: { bg: 'bg-gradient-to-br from-cyan-400 to-teal-500', border: 'border-cyan-200', hex: '#0891B2' }
+    };
+
+    function getArrowSvg(dir) {
+      let rotation = 0;
+      if (dir === 'right') rotation = 90;
+      else if (dir === 'down') rotation = 180;
+      else if (dir === 'left') rotation = 270;
+
+      return `
+        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md" style="transform: rotate(${rotation}deg);" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.5a1.5 1.5 0 0 1 1.06.44l7 7a1.5 1.5 0 0 1-2.12 2.12L13.5 7.62V20a1.5 1.5 0 0 1-3 0V7.62l-4.44 4.44a1.5 1.5 0 0 1-2.12-2.12l7-7A1.5 1.5 0 0 1 12 2.5z"/>
+        </svg>
+      `;
+    }
+
+    let currentLevelIndex = 0;
+    let currentBoard = null;
+    let comboCount = 0;
+
+    const STORAGE_KEY = 'gogo_blast_save_v1';
+    let saveData = {
+      unlockedLevel: 1,
+      completedLevels: {}
+    };
+
+    function loadSaveData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            saveData = { ...saveData, ...parsed };
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load from localStorage:", e);
+      }
+    }
+
+    function saveGameData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+      } catch (e) {
+        console.warn("Could not save to localStorage:", e);
+      }
+    }
+
+    function initLevel(index) {
+      currentLevelIndex = index;
+      const levelDef = LEVELS[index];
+      comboCount = 0;
+
+      currentBoard = {
+        rows: levelDef.rows,
+        cols: levelDef.cols,
+        items: JSON.parse(JSON.stringify(levelDef.items))
+      };
+
+      document.getElementById('levelBadge').textContent = `Lv. ${levelDef.id} / ${LEVELS.length}`;
+      document.getElementById('levelTitle').textContent = levelDef.title;
+      document.getElementById('hintText').textContent = levelDef.hint;
+      updateRemainCount();
+
+      renderGridBackground(levelDef.rows, levelDef.cols);
+      renderBoard();
+    }
+
+    function renderGridBackground(rows, cols) {
+      const bg = document.getElementById('gridBackground');
+      bg.innerHTML = '';
+      bg.style.display = 'grid';
+      bg.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+      bg.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      bg.style.gap = '6px';
+      bg.style.padding = '6px';
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'rounded-xl bg-slate-200/50 border border-slate-300/40';
+          bg.appendChild(cell);
+        }
+      }
+    }
+
+    function updateRemainCount() {
+      const arrowsLeft = currentBoard.items.filter(item => item.type !== 'rock' && !item.isFlying).length;
+      document.getElementById('remainCount').textContent = arrowsLeft;
+    }
+
+    function renderBoard() {
+      const container = document.getElementById('boardContainer');
+      container.innerHTML = '';
+
+      const { rows, cols, items } = currentBoard;
+      const cellW = 100 / cols;
+      const cellH = 100 / rows;
+
+      items.forEach(item => {
+        const el = document.createElement('div');
+        el.id = `item-${item.id}`;
+        el.style.position = 'absolute';
+        el.style.left = `${item.c * cellW}%`;
+        el.style.top = `${item.r * cellH}%`;
+        el.style.width = `${cellW}%`;
+        el.style.height = `${cellH}%`;
+        el.style.padding = '4px';
+
+        const inner = document.createElement('div');
+        inner.className = 'w-full h-full rounded-2xl flex items-center justify-center relative transition-transform';
+
+        if (item.type === 'rock') {
+          inner.className += ' rock-3d border-2 border-slate-400';
+          inner.innerHTML = `
+            <svg class="w-8 h-8 text-slate-200 drop-shadow" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.5 9.5L15 4H9L4.5 9.5L3 16l4 4h10l4-4-1.5-6.5z"/>
+            </svg>
+          `;
+        } else {
+          const theme = COLOR_THEMES[item.color] || COLOR_THEMES.orange;
+          inner.className += ` block-3d ${theme.bg} border-2 ${theme.border}`;
+          inner.innerHTML = getArrowSvg(item.dir);
+
+          el.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            handleBlockTap(item);
+          });
+        }
+
+        el.appendChild(inner);
+        container.appendChild(el);
+      });
+    }
+
+    function checkCanFly(arrow) {
+      const { r, c, dir } = arrow;
+      const dr = dir === 'up' ? -1 : dir === 'down' ? 1 : 0;
+      const dc = dir === 'left' ? -1 : dir === 'right' ? 1 : 0;
+
+      let curR = r + dr;
+      let curC = c + dc;
+
+      while (curR >= 0 && curR < currentBoard.rows && curC >= 0 && curC < currentBoard.cols) {
+        const blocker = currentBoard.items.find(it => !it.isFlying && it.r === curR && it.c === curC);
+        if (blocker) {
+          return false;
+        }
+        curR += dr;
+        curC += dc;
+      }
+      return true;
+    }
+
+    function handleBlockTap(arrow) {
+      if (arrow.isFlying || arrow.isShaking) return;
+
+      const canFly = checkCanFly(arrow);
+      const el = document.getElementById(`item-${arrow.id}`);
+      if (!el) return;
+      const inner = el.firstElementChild;
+
+      if (canFly) {
+        arrow.isFlying = true;
+        comboCount++;
+        playLaunchSound(comboCount);
+
+        const rect = el.getBoundingClientRect();
+        const theme = COLOR_THEMES[arrow.color] || COLOR_THEMES.orange;
+        spawnStarburst(rect.left + rect.width / 2, rect.top + rect.height / 2, theme.hex);
+
+        inner.classList.add(`fly-${arrow.dir}`);
+        updateRemainCount();
+
+        setTimeout(() => {
+          currentBoard.items = currentBoard.items.filter(it => it.id !== arrow.id);
+          el.remove();
+          checkLevelClear();
+        }, 320);
+
+      } else {
+        arrow.isShaking = true;
+        comboCount = 0;
+        playBounceSound();
+
+        inner.classList.add(`shaking-${arrow.dir}`);
+        setTimeout(() => {
+          inner.classList.remove(`shaking-${arrow.dir}`);
+          arrow.isShaking = false;
+        }, 340);
+      }
+    }
+
+    function checkLevelClear() {
+      const remainingArrows = currentBoard.items.filter(it => it.type !== 'rock' && !it.isFlying);
+      if (remainingArrows.length === 0) {
+        setTimeout(() => {
+          handleLevelComplete();
+        }, 200);
+      }
+    }
+
+    function handleLevelComplete() {
+      playClearSound();
+      spawnConfetti();
+
+      const levelId = LEVELS[currentLevelIndex].id;
+      saveData.completedLevels[levelId] = 3;
+      if (currentLevelIndex + 1 < LEVELS.length) {
+        saveData.unlockedLevel = Math.max(saveData.unlockedLevel, levelId + 1);
+      }
+      saveGameData();
+
+      const heading = document.getElementById('clearModalHeading');
+      const desc = document.getElementById('clearModalDesc');
+      const nextBtn = document.getElementById('nextLevelBtn');
+
+      if (currentLevelIndex + 1 >= LEVELS.length) {
+        heading.textContent = "全ステージ制覇！マスター！🎉";
+        desc.innerHTML = "すべてのレベルをクリアしたよ！<br>さいこうの パズルマスターだね！🌟";
+        nextBtn.textContent = "レベル1から もういちど遊ぶ 🚀";
+      } else {
+        heading.textContent = "たいへんよくできました！";
+        desc.innerHTML = "ぜんぶのやじるしが とんでいったよ！<br>つぎのステージに ちょうせんしよう！";
+        nextBtn.textContent = "つぎのレベルへ GO! 🚀";
+      }
+
+      const modal = document.getElementById('clearModal');
+      modal.classList.remove('hidden');
+    }
+
+    function openLevelSelectModal() {
+      const modal = document.getElementById('levelModal');
+      const grid = document.getElementById('levelGrid');
+      grid.innerHTML = '';
+
+      LEVELS.forEach((lvl, idx) => {
+        const isUnlocked = lvl.id <= saveData.unlockedLevel;
+        const isCompleted = saveData.completedLevels[lvl.id] !== undefined;
+
+        const btn = document.createElement('button');
+        btn.className = `p-3 rounded-2xl flex flex-col items-center justify-between border-2 transition-all text-center relative ${
+          isUnlocked 
+            ? 'btn-3d bg-indigo-50 border-indigo-200 hover:bg-indigo-100 text-indigo-900 cursor-pointer' 
+            : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60 cursor-not-allowed'
+        }`;
+
+        if (idx === currentLevelIndex) {
+          btn.className += ' ring-4 ring-amber-400';
+        }
+
+        btn.innerHTML = `
+          <div class="flex items-center justify-between w-full mb-1">
+            <span class="font-black text-sm">Lv.${lvl.id}</span>
+            <span>${isUnlocked ? (isCompleted ? '⭐️⭐️⭐️' : '✨') : '🔒'}</span>
+          </div>
+          <div class="font-bold text-xs truncate w-full text-slate-700">${lvl.title}</div>
+        `;
+
+        if (isUnlocked) {
+          btn.addEventListener('click', () => {
+            playClickSound();
+            initLevel(idx);
+            modal.classList.add('hidden');
+          });
+        }
+
+        grid.appendChild(btn);
+      });
+
+      document.getElementById('resetConfirmBanner').classList.add('hidden');
+      modal.classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSaveData();
+
+      const initialLevel = Math.min(saveData.unlockedLevel - 1, LEVELS.length - 1);
+      initLevel(initialLevel >= 0 ? initialLevel : 0);
+
+      document.getElementById('retryBtn').addEventListener('click', () => {
+        playClickSound();
+        initLevel(currentLevelIndex);
+      });
+
+      const soundBtn = document.getElementById('soundToggleBtn');
+      const soundOn = document.getElementById('soundIconOn');
+      const soundOff = document.getElementById('soundIconOff');
+      soundBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        if (soundEnabled) {
+          soundOn.classList.remove('hidden');
+          soundOff.classList.add('hidden');
+          playClickSound();
+        } else {
+          soundOn.classList.add('hidden');
+          soundOff.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('levelSelectBtn').addEventListener('click', () => {
+        playClickSound();
+        openLevelSelectModal();
+      });
+
+      document.getElementById('closeLevelModalBtn').addEventListener('click', () => {
+        playClickSound();
+        document.getElementById('levelModal').classList.add('hidden');
+      });
+
+      document.getElementById('nextLevelBtn').addEventListener('click', () => {
+        playClickSound();
+        document.getElementById('clearModal').classList.add('hidden');
+        if (currentLevelIndex + 1 < LEVELS.length) {
+          initLevel(currentLevelIndex + 1);
+        } else {
+          initLevel(0);
+        }
+      });
+
+      document.getElementById('replayClearBtn').addEventListener('click', () => {
+        playClickSound();
+        document.getElementById('clearModal').classList.add('hidden');
+        initLevel(currentLevelIndex);
+      });
+
+      document.getElementById('helpBtn').addEventListener('click', () => {
+        playClickSound();
+        document.getElementById('helpModal').classList.remove('hidden');
+      });
+      document.getElementById('closeHelpModalBtn').addEventListener('click', () => {
+        playClickSound();
+        document.getElementById('helpModal').classList.add('hidden');
+      });
+
+      const resetBanner = document.getElementById('resetConfirmBanner');
+      document.getElementById('resetDataBtn').addEventListener('click', () => {
+        playClickSound();
+        resetBanner.classList.toggle('hidden');
+      });
+
+      document.getElementById('confirmResetYes').addEventListener('click', () => {
+        playClickSound();
+        saveData = { unlockedLevel: 1, completedLevels: {} };
+        saveGameData();
+        initLevel(0);
+        resetBanner.classList.add('hidden');
+        document.getElementById('levelModal').classList.add('hidden');
+      });
+
+      document.getElementById('confirmResetNo').addEventListener('click', () => {
+        playClickSound();
+        resetBanner.classList.add('hidden');
+      });
+    });
+  </script>
+</body>
+</html>
